@@ -1,0 +1,5523 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1.0,maximum-scale=1.0,user-scalable=no">
+<title>Meowzarrela</title>
+
+<style>/* ==========================
+   BOOK CREATOR
+========================== */
+
+.book-status{
+    display:inline-block;
+    margin-top:7px;
+    padding:4px 7px;
+    border-radius:7px;
+    background:#fff3b8;
+    color:#755b00;
+    font-size:10px;
+    font-weight:bold;
+}
+
+body.dark .book-status{
+    background:#4a3d12;
+    color:#ffe16a;
+}
+
+.draft-card{
+    border:2px dashed var(--yellow);
+}
+
+.draft-actions{
+    display:flex;
+    gap:7px;
+}
+
+.draft-actions button{
+    flex:1;
+}
+
+/* NOVEL EDITOR */
+
+.chapter-list{
+    display:flex;
+    flex-direction:column;
+    gap:8px;
+    margin-bottom:15px;
+}
+
+.chapter-item{
+    display:flex;
+    align-items:center;
+    gap:8px;
+    padding:11px;
+    border:1px solid var(--line);
+    border-radius:12px;
+    background:var(--bg);
+}
+
+.chapter-item.active{
+    border-color:var(--yellow);
+    background:#fffbea;
+}
+
+body.dark .chapter-item.active{
+    background:#302a12;
+}
+
+.chapter-item-info{
+    flex:1;
+}
+
+.chapter-item-info b{
+    display:block;
+    font-size:13px;
+}
+
+.chapter-item-info span{
+    color:var(--muted);
+    font-size:11px;
+}
+
+.chapter-editor-actions{
+    display:flex;
+    gap:8px;
+    flex-wrap:wrap;
+}
+
+.chapter-editor-actions button{
+    flex:1;
+    min-width:130px;
+}
+
+/* REAL BOOK */
+
+.real-book-wrap{
+    width:100%;
+    perspective:1800px;
+    margin-top:10px;
+    touch-action:pan-y;
+}
+
+.real-book{
+    position:relative;
+    width:100%;
+    min-height:540px;
+    display:flex;
+    background:#d9c29b;
+    border-radius:8px 15px 15px 8px;
+    box-shadow:
+        0 18px 35px rgba(0,0,0,.22),
+        inset 0 0 0 2px rgba(90,60,20,.18);
+    overflow:hidden;
+}
+
+.book-page{
+    position:relative;
+    flex:1;
+    min-width:0;
+    padding:38px 32px;
+    background:
+        linear-gradient(
+            90deg,
+            rgba(0,0,0,.04),
+            transparent 12%,
+            transparent 88%,
+            rgba(0,0,0,.035)
+        ),
+        #fffdf5;
+    color:#29251d;
+    overflow:hidden;
+}
+
+body.dark .book-page{
+    background:#eee8d9;
+    color:#29251d;
+}
+
+.book-page.left{
+    border-right:1px solid #d8cdb7;
+}
+
+.book-page.right{
+    border-left:1px solid #d8cdb7;
+}
+
+.book-page-number{
+    position:absolute;
+    bottom:13px;
+    left:0;
+    right:0;
+    text-align:center;
+    color:#9a8e78;
+    font-size:11px;
+}
+
+.book-page-content{
+    height:100%;
+    overflow:hidden;
+}
+
+.book-page-content h3{
+    font-family:Georgia,serif;
+    font-size:21px;
+    margin-bottom:22px;
+    text-align:center;
+}
+
+.book-page-content p{
+    font-family:Georgia,"Times New Roman",serif;
+    font-size:16px;
+    line-height:1.85;
+    text-align:justify;
+    white-space:pre-wrap;
+}
+
+.book-page.empty-page{
+    background:#f4eddd;
+}
+
+body.dark .book-page.empty-page{
+    background:#e2dac8;
+}
+
+.book-spine{
+    position:absolute;
+    left:50%;
+    top:0;
+    bottom:0;
+    width:12px;
+    transform:translateX(-50%);
+    background:
+        linear-gradient(
+            90deg,
+            rgba(0,0,0,.15),
+            rgba(255,255,255,.35),
+            rgba(0,0,0,.12)
+        );
+    z-index:5;
+    pointer-events:none;
+}
+
+.book-flip{
+    position:absolute;
+    z-index:10;
+    top:0;
+    bottom:0;
+    width:50%;
+    background:#fffdf5;
+    transform-style:preserve-3d;
+    backface-visibility:hidden;
+    box-shadow:0 0 15px rgba(0,0,0,.15);
+    display:none;
+}
+
+.book-flip.turn-next{
+    right:0;
+    transform-origin:left center;
+    animation:pageFlipNext .55s ease;
+}
+
+.book-flip.turn-prev{
+    left:0;
+    transform-origin:right center;
+    animation:pageFlipPrev .55s ease;
+}
+
+@keyframes pageFlipNext{
+    0%{
+        transform:rotateY(0deg);
+    }
+    100%{
+        transform:rotateY(-180deg);
+    }
+}
+
+@keyframes pageFlipPrev{
+    0%{
+        transform:rotateY(0deg);
+    }
+    100%{
+        transform:rotateY(180deg);
+    }
+}
+
+.book-hint{
+    text-align:center;
+    color:var(--muted);
+    font-size:11px;
+    margin-top:10px;
+}
+
+.novel-reader-controls{
+    display:flex;
+    align-items:center;
+    justify-content:space-between;
+    gap:8px;
+    margin-top:14px;
+}
+
+.chapter-indicator{
+    color:var(--muted);
+    font-size:12px;
+    text-align:center;
+}
+
+/* MANGA */
+
+.manga-reader{
+    background:#111;
+    border-radius:15px;
+    padding:8px;
+    overflow:hidden;
+    touch-action:pan-y;
+}
+
+.manga-reader img{
+    width:100%;
+    max-height:76vh;
+    object-fit:contain;
+    display:block;
+    margin:auto;
+}
+
+.reader-direction{
+    text-align:center;
+    color:var(--muted);
+    font-size:11px;
+    margin-top:7px;
+}
+
+/* MOBILE BOOK */
+
+@media(max-width:600px){
+
+    .real-book{
+        min-height:500px;
+    }
+
+    .book-page{
+        padding:28px 20px;
+    }
+
+    .book-page-content p{
+        font-size:15px;
+        line-height:1.75;
+    }
+
+}
+
+@media(max-width:480px){
+
+    .real-book{
+        min-height:470px;
+    }
+
+    .book-page.left{
+        display:none;
+    }
+
+    .book-page.right{
+        display:block;
+        border-left:0;
+    }
+
+    .book-spine{
+        display:none;
+    }
+
+    .book-page-content p{
+        font-size:16px;
+    }
+
+}
+*{
+    box-sizing:border-box;
+    margin:0;
+    padding:0;
+    -webkit-tap-highlight-color:transparent;
+}
+
+:root{
+    --bg:#fffdf7;
+    --card:#ffffff;
+    --text:#242424;
+    --muted:#888;
+    --line:#eee8dc;
+    --yellow:#f6c945;
+    --yellow-dark:#d5a927;
+    --danger:#e5484d;
+    --shadow:0 8px 28px rgba(0,0,0,.08);
+}
+
+body.dark{
+    --bg:#151515;
+    --card:#202020;
+    --text:#f5f5f5;
+    --muted:#aaa;
+    --line:#333;
+    --shadow:0 8px 28px rgba(0,0,0,.28);
+}
+
+body{
+    font-family:Arial,Helvetica,sans-serif;
+    background:var(--bg);
+    color:var(--text);
+    min-height:100vh;
+}
+
+button,input,textarea,select{
+    font:inherit;
+}
+
+button{
+    border:0;
+    cursor:pointer;
+}
+
+.hidden{
+    display:none!important;
+}
+
+/* HEADER */
+
+.header{
+    height:68px;
+    padding:0 16px;
+    display:flex;
+    align-items:center;
+    justify-content:space-between;
+    position:sticky;
+    top:0;
+    z-index:30;
+    background:var(--bg);
+    border-bottom:1px solid var(--line);
+}
+
+.brand{
+    display:flex;
+    align-items:center;
+    gap:10px;
+    font-size:21px;
+    font-weight:900;
+}
+
+.cheese{
+    width:38px;
+    height:30px;
+    background:#ffd84d;
+    border-radius:8px 8px 10px 10px;
+    box-shadow:0 4px 0 #d9aa21;
+    position:relative;
+}
+
+.cheese:before,
+.cheese:after{
+    content:"";
+    position:absolute;
+    background:#dcae27;
+    border-radius:50%;
+}
+
+.cheese:before{
+    width:6px;
+    height:6px;
+    left:9px;
+    top:8px;
+}
+
+.cheese:after{
+    width:8px;
+    height:8px;
+    right:7px;
+    bottom:5px;
+}
+
+.header-actions{
+    display:flex;
+    gap:8px;
+}
+
+.icon-btn{
+    width:40px;
+    height:40px;
+    border-radius:50%;
+    background:var(--card);
+    color:var(--text);
+    box-shadow:var(--shadow);
+}
+
+/* APP */
+
+.app{
+    max-width:700px;
+    margin:auto;
+    min-height:100vh;
+    padding-bottom:90px;
+}
+
+/* SEARCH */
+
+.search{
+    padding:14px 16px 4px;
+}
+
+.search input{
+    width:100%;
+    padding:13px 15px;
+    border:1px solid var(--line);
+    border-radius:14px;
+    outline:none;
+    background:var(--card);
+    color:var(--text);
+}
+
+/* EMPTY HOME */
+
+.empty{
+    min-height:68vh;
+    display:flex;
+    align-items:center;
+    justify-content:center;
+    flex-direction:column;
+    text-align:center;
+    padding:30px;
+}
+
+.empty-cheese{
+    font-size:70px;
+    margin-bottom:18px;
+}
+
+.empty h1{
+    font-size:25px;
+    margin-bottom:8px;
+}
+
+.empty p{
+    max-width:340px;
+    color:var(--muted);
+    line-height:1.5;
+}
+
+.main-btn{
+    background:var(--yellow);
+    color:#222;
+    padding:13px 21px;
+    border-radius:14px;
+    font-weight:800;
+    box-shadow:0 4px 0 var(--yellow-dark);
+    margin-top:20px;
+}
+
+.main-btn:active{
+    transform:translateY(3px);
+    box-shadow:0 1px 0 var(--yellow-dark);
+}
+
+/* FEED */
+
+.feed{
+    padding:12px;
+}
+
+.post{
+    background:var(--card);
+    border:1px solid var(--line);
+    border-radius:20px;
+    overflow:hidden;
+    margin-bottom:17px;
+    box-shadow:var(--shadow);
+}
+
+.post-head{
+    display:flex;
+    align-items:center;
+    gap:10px;
+    padding:13px;
+}
+
+.avatar{
+    width:42px;
+    height:42px;
+    border-radius:50%;
+    background:var(--yellow);
+    display:flex;
+    align-items:center;
+    justify-content:center;
+    font-weight:900;
+    overflow:hidden;
+    flex-shrink:0;
+}
+
+.avatar img{
+    width:100%;
+    height:100%;
+    object-fit:cover;
+}
+
+.author{
+    flex:1;
+}
+
+.author b{
+    display:block;
+}
+
+.author span{
+    color:var(--muted);
+    font-size:12px;
+}
+
+.more{
+    background:none;
+    color:var(--muted);
+    font-size:22px;
+}
+
+.media{
+    background:#111;
+    position:relative;
+}
+
+.media video,
+.media img{
+    width:100%;
+    display:block;
+    max-height:530px;
+    object-fit:contain;
+    background:#111;
+}
+
+.duration{
+    position:absolute;
+    right:9px;
+    bottom:9px;
+    background:#000c;
+    color:#fff;
+    padding:4px 7px;
+    border-radius:6px;
+    font-size:12px;
+}
+
+.post-body{
+    padding:13px;
+}
+
+.post-title{
+    font-size:18px;
+    font-weight:900;
+    margin-bottom:6px;
+}
+
+.post-desc{
+    color:var(--muted);
+    font-size:14px;
+    line-height:1.45;
+}
+
+.category{
+    display:inline-block;
+    margin-top:10px;
+    padding:5px 9px;
+    border-radius:8px;
+    background:#fff3b8;
+    color:#755b00;
+    font-size:12px;
+    font-weight:bold;
+}
+
+body.dark .category{
+    background:#4a3d12;
+    color:#ffe16a;
+}
+
+.stats{
+    display:flex;
+    flex-wrap:wrap;
+    gap:15px;
+    color:var(--muted);
+    font-size:13px;
+    margin-top:12px;
+}
+
+.actions{
+    display:flex;
+    border-top:1px solid var(--line);
+}
+
+.action{
+    flex:1;
+    padding:12px 4px;
+    background:none;
+    color:var(--muted);
+    font-weight:bold;
+}
+
+.action.active{
+    color:#e5484d;
+}
+
+/* NAV */
+
+.nav{
+    position:fixed;
+    bottom:0;
+    left:50%;
+    transform:translateX(-50%);
+    width:min(700px,100%);
+    height:72px;
+    display:flex;
+    justify-content:space-around;
+    align-items:center;
+    background:var(--card);
+    border-top:1px solid var(--line);
+    z-index:40;
+}
+
+.nav button{
+    background:none;
+    color:var(--muted);
+    display:flex;
+    flex-direction:column;
+    align-items:center;
+    gap:4px;
+    font-size:11px;
+}
+
+.nav button.active{
+    color:var(--text);
+    font-weight:bold;
+}
+
+.create-circle{
+    width:50px!important;
+    height:50px!important;
+    border-radius:17px!important;
+    background:var(--yellow)!important;
+    color:#222!important;
+    font-size:25px!important;
+    box-shadow:0 4px 0 var(--yellow-dark);
+}
+
+/* PAGE */
+
+.page-title{
+    padding:20px 16px 7px;
+    font-size:25px;
+    font-weight:900;
+}
+
+/* MODAL */
+
+.overlay{
+    position:fixed;
+    inset:0;
+    background:rgba(0,0,0,.6);
+    z-index:100;
+    display:none;
+    align-items:flex-end;
+    justify-content:center;
+}
+
+.overlay.show{
+    display:flex;
+}
+
+.modal{
+    width:min(700px,100%);
+    max-height:92vh;
+    overflow-y:auto;
+    background:var(--card);
+    color:var(--text);
+    border-radius:25px 25px 0 0;
+    padding:20px;
+    animation:slideUp .22s ease;
+}
+
+@keyframes slideUp{
+    from{transform:translateY(100%)}
+    to{transform:translateY(0)}
+}
+
+.modal-head{
+    display:flex;
+    justify-content:space-between;
+    align-items:center;
+    margin-bottom:18px;
+}
+
+.close{
+    width:36px;
+    height:36px;
+    border-radius:50%;
+    background:var(--line);
+    color:var(--text);
+}
+
+/* FORMS */
+
+.field{
+    margin-bottom:14px;
+}
+
+.field label{
+    display:block;
+    font-size:13px;
+    font-weight:bold;
+    margin-bottom:6px;
+}
+
+.field input,
+.field textarea,
+.field select{
+    width:100%;
+    padding:12px;
+    border:1px solid var(--line);
+    border-radius:12px;
+    background:var(--bg);
+    color:var(--text);
+    outline:none;
+}
+
+.field textarea{
+    min-height:90px;
+    resize:vertical;
+}
+
+.file-box{
+    border:2px dashed var(--line);
+    padding:17px;
+    border-radius:14px;
+    text-align:center;
+    color:var(--muted);
+}
+
+.file-box input{
+    display:block;
+    width:100%;
+    margin-top:9px;
+}
+
+/* PROFILE */
+
+.profile{
+    padding:26px 16px;
+    text-align:center;
+}
+
+.profile-avatar{
+    width:105px;
+    height:105px;
+    border-radius:50%;
+    margin:auto;
+    background:var(--yellow);
+    display:flex;
+    justify-content:center;
+    align-items:center;
+    font-size:40px;
+    font-weight:900;
+    overflow:hidden;
+}
+
+.profile-avatar img{
+    width:100%;
+    height:100%;
+    object-fit:cover;
+}
+
+.profile h2{
+    margin-top:13px;
+}
+
+.profile-username{
+    color:var(--muted);
+    margin-top:5px;
+}
+
+.profile-bio{
+    max-width:450px;
+    margin:12px auto 0;
+    color:var(--muted);
+    line-height:1.45;
+}
+
+.profile-info{
+    margin:16px auto;
+    max-width:450px;
+    text-align:left;
+    background:var(--card);
+    border:1px solid var(--line);
+    border-radius:16px;
+    overflow:hidden;
+}
+
+.info-row{
+    display:flex;
+    gap:10px;
+    padding:12px 14px;
+    border-bottom:1px solid var(--line);
+}
+
+.info-row:last-child{
+    border-bottom:0;
+}
+
+.info-icon{
+    width:25px;
+}
+
+.info-label{
+    color:var(--muted);
+    font-size:12px;
+}
+
+.info-value{
+    margin-top:2px;
+}
+
+.profile-stats{
+    display:flex;
+    justify-content:center;
+    gap:32px;
+    margin:22px 0;
+}
+
+.profile-stats b{
+    display:block;
+    font-size:20px;
+}
+
+.profile-stats span{
+    color:var(--muted);
+    font-size:12px;
+}
+
+/* EDIT PROFILE */
+
+.edit-photo{
+    text-align:center;
+    margin-bottom:20px;
+}
+
+.edit-photo-preview{
+    width:95px;
+    height:95px;
+    border-radius:50%;
+    background:var(--yellow);
+    margin:auto;
+    display:flex;
+    justify-content:center;
+    align-items:center;
+    overflow:hidden;
+    font-size:35px;
+    font-weight:bold;
+}
+
+.edit-photo-preview img{
+    width:100%;
+    height:100%;
+    object-fit:cover;
+}
+
+.change-photo{
+    display:inline-block;
+    margin-top:10px;
+    color:#a27600;
+    font-weight:bold;
+    cursor:pointer;
+}
+
+body.dark .change-photo{
+    color:#ffe16a;
+}
+
+/* COMMENTS */
+
+.comment-list{
+    max-height:63vh;
+    overflow-y:auto;
+    overscroll-behavior:contain;
+}
+
+.comment{
+    display:flex;
+    gap:9px;
+    padding:12px 0;
+    border-bottom:1px solid var(--line);
+}
+
+.comment .avatar{
+    width:35px;
+    height:35px;
+    font-size:12px;
+}
+
+.comment-content{
+    flex:1;
+}
+
+.comment-content b{
+    font-size:14px;
+}
+
+.comment-content p{
+    margin-top:4px;
+    font-size:14px;
+    line-height:1.4;
+}
+
+.comment-form{
+    display:flex;
+    gap:8px;
+    position:sticky;
+    bottom:0;
+    background:var(--card);
+    padding-top:12px;
+}
+
+.comment-form input{
+    flex:1;
+    padding:11px;
+    border:1px solid var(--line);
+    border-radius:12px;
+    background:var(--bg);
+    color:var(--text);
+    outline:none;
+}
+
+.comment-form button{
+    background:var(--yellow);
+    padding:0 16px;
+    border-radius:12px;
+    font-weight:bold;
+}
+
+/* RATING */
+
+.rating{
+    display:flex;
+    justify-content:center;
+    gap:5px;
+    margin:20px 0;
+}
+
+.star{
+    background:none;
+    color:#bbb;
+    font-size:35px;
+}
+
+.star.selected{
+    color:#ffc400;
+}
+
+/* STUDIO */
+
+.studio{
+    padding:15px;
+}
+
+.studio-top{
+    display:flex;
+    justify-content:space-between;
+    align-items:center;
+    margin-bottom:12px;
+}
+
+.canvas-wrap{
+    padding:10px;
+    background:#ddd;
+    border-radius:18px;
+    overflow:auto;
+    text-align:center;
+}
+
+#drawCanvas{
+    background:white;
+    border-radius:8px;
+    max-width:100%;
+    touch-action:none;
+}
+
+.tools{
+    display:flex;
+    flex-wrap:wrap;
+    gap:8px;
+    margin-top:12px;
+}
+
+.tool{
+    padding:9px 11px;
+    border:1px solid var(--line);
+    border-radius:11px;
+    background:var(--card);
+    color:var(--text);
+}
+
+.frames{
+    display:flex;
+    gap:8px;
+    overflow-x:auto;
+    padding:12px 0;
+}
+
+.frame{
+    min-width:70px;
+    height:55px;
+    border:2px solid var(--line);
+    border-radius:9px;
+    background:#fff;
+    overflow:hidden;
+    position:relative;
+}
+
+.frame.active{
+    border-color:var(--yellow);
+}
+
+.frame img{
+    width:100%;
+    height:100%;
+    object-fit:cover;
+}
+
+.frame span{
+    position:absolute;
+    right:3px;
+    bottom:2px;
+    color:#fff;
+    background:#0009;
+    padding:1px 3px;
+    font-size:9px;
+}
+
+/* LIBRARY */
+
+.library{
+    padding:14px;
+}
+
+.library-header{
+    display:flex;
+    align-items:center;
+    justify-content:space-between;
+    gap:10px;
+    margin-bottom:15px;
+}
+
+.library-header p{
+    color:var(--muted);
+    font-size:13px;
+    margin-top:4px;
+}
+
+.library-create{
+    width:48px;
+    height:48px;
+    flex-shrink:0;
+    border-radius:15px;
+    background:var(--yellow);
+    color:#222;
+    font-size:25px;
+    font-weight:bold;
+    box-shadow:0 4px 0 var(--yellow-dark);
+}
+
+.library-tabs{
+    display:flex;
+    gap:8px;
+    overflow-x:auto;
+    padding-bottom:5px;
+    margin-bottom:14px;
+}
+
+.library-tab{
+    white-space:nowrap;
+    padding:9px 13px;
+    border-radius:12px;
+    background:var(--card);
+    color:var(--muted);
+    border:1px solid var(--line);
+    font-weight:bold;
+    font-size:12px;
+}
+
+.library-tab.active{
+    background:var(--yellow);
+    color:#222;
+    border-color:var(--yellow);
+}
+
+.library-grid{
+    display:grid;
+    grid-template-columns:repeat(2,minmax(0,1fr));
+    gap:12px;
+}
+
+.book-card{
+    background:var(--card);
+    border:1px solid var(--line);
+    border-radius:17px;
+    overflow:hidden;
+    box-shadow:var(--shadow);
+}
+
+.book-cover{
+    height:210px;
+    background:#eee;
+    position:relative;
+    overflow:hidden;
+    display:flex;
+    align-items:center;
+    justify-content:center;
+}
+
+.book-cover img{
+    width:100%;
+    height:100%;
+    object-fit:cover;
+}
+
+.book-cover-icon{
+    font-size:55px;
+}
+
+.book-type{
+    position:absolute;
+    top:8px;
+    left:8px;
+    padding:5px 7px;
+    border-radius:7px;
+    background:#000b;
+    color:#fff;
+    font-size:10px;
+    font-weight:bold;
+}
+
+.book-info{
+    padding:11px;
+}
+
+.book-title{
+    font-size:15px;
+    font-weight:900;
+    line-height:1.25;
+}
+
+.book-author{
+    margin-top:4px;
+    color:var(--muted);
+    font-size:11px;
+}
+
+.book-description{
+    margin-top:7px;
+    color:var(--muted);
+    font-size:11px;
+    line-height:1.35;
+}
+
+.book-action{
+    width:100%;
+    margin-top:10px;
+    padding:9px;
+    border-radius:10px;
+    background:var(--yellow);
+    color:#222;
+    font-weight:bold;
+}
+
+.library-empty{
+    text-align:center;
+    padding:70px 20px;
+    color:var(--muted);
+}
+
+.library-empty-icon{
+    font-size:60px;
+    margin-bottom:12px;
+}
+
+/* READER */
+
+.reader{
+    padding:15px;
+}
+
+.reader-top{
+    display:flex;
+    align-items:center;
+    gap:10px;
+    margin-bottom:15px;
+}
+
+.reader-back{
+    width:40px;
+    height:40px;
+    border-radius:12px;
+    background:var(--card);
+    color:var(--text);
+    border:1px solid var(--line);
+}
+
+.reader-title{
+    flex:1;
+    font-weight:900;
+    font-size:18px;
+}
+
+.reader-progress{
+    height:5px;
+    background:var(--line);
+    border-radius:10px;
+    overflow:hidden;
+    margin-bottom:15px;
+}
+
+.reader-progress span{
+    display:block;
+    height:100%;
+    background:var(--yellow);
+    width:0%;
+}
+
+.comic-reader{
+    background:#111;
+    border-radius:15px;
+    padding:8px;
+    text-align:center;
+}
+
+.comic-reader img{
+    width:100%;
+    max-height:75vh;
+    object-fit:contain;
+    display:block;
+    margin:auto;
+}
+
+.comic-controls{
+    display:flex;
+    align-items:center;
+    justify-content:space-between;
+    gap:8px;
+    margin-top:12px;
+}
+
+.reader-btn{
+    padding:10px 14px;
+    border-radius:11px;
+    background:var(--card);
+    color:var(--text);
+    border:1px solid var(--line);
+    font-weight:bold;
+}
+
+.reader-btn.primary{
+    background:var(--yellow);
+    color:#222;
+    border-color:var(--yellow);
+}
+
+.novel-reader{
+    background:var(--card);
+    border:1px solid var(--line);
+    border-radius:17px;
+    padding:20px;
+    box-shadow:var(--shadow);
+}
+
+.novel-chapter-title{
+    font-size:22px;
+    font-weight:900;
+    margin-bottom:17px;
+}
+
+.novel-text{
+    white-space:pre-wrap;
+    line-height:1.8;
+    font-size:17px;
+}
+
+.novel-controls{
+    display:flex;
+    gap:8px;
+    margin-top:18px;
+    flex-wrap:wrap;
+}
+
+/* SETTINGS */
+
+.settings{
+    padding:15px 16px;
+}
+
+.setting{
+    display:flex;
+    justify-content:space-between;
+    align-items:center;
+    padding:17px 0;
+    border-bottom:1px solid var(--line);
+}
+
+.toggle{
+    width:48px;
+    height:27px;
+    padding:3px;
+    border-radius:20px;
+    background:#aaa;
+}
+
+.toggle span{
+    display:block;
+    width:21px;
+    height:21px;
+    background:#fff;
+    border-radius:50%;
+    transition:.2s;
+}
+
+.toggle.on{
+    background:var(--yellow);
+}
+
+.toggle.on span{
+    transform:translateX(21px);
+}
+
+/* TOAST */
+
+.toast{
+    position:fixed;
+    left:50%;
+    bottom:88px;
+    transform:translate(-50%,20px);
+    background:#222;
+    color:#fff;
+    padding:11px 16px;
+    border-radius:12px;
+    opacity:0;
+    pointer-events:none;
+    transition:.25s;
+    z-index:200;
+    font-size:13px;
+}
+
+.toast.show{
+    opacity:1;
+    transform:translate(-50%,0);
+}
+
+@media(max-width:420px){
+    .library-grid{
+        grid-template-columns:1fr 1fr;
+    }
+
+    .book-cover{
+        height:175px;
+    }
+}
+</style>
+</head>
+
+<body>
+
+<div class="app">
+
+<header class="header">
+
+<div class="brand">
+    <div class="cheese"></div>
+    <span>Meowzarrela</span>
+</div>
+
+<div class="header-actions">
+    <button class="icon-btn" onclick="toggleSearch()">🔎</button>
+    <button class="icon-btn" onclick="openSettings()">⚙️</button>
+</div>
+
+</header>
+
+<div id="searchBox" class="search hidden">
+    <input
+        id="searchInput"
+        placeholder="Search cartoons, books or creators..."
+        oninput="renderHome()">
+</div>
+
+<!-- HOME -->
+
+<main id="homePage">
+
+<div id="emptyHome" class="empty">
+
+    <div class="empty-cheese">🧀</div>
+
+    <h1 id="emptyTitle">Nothing here yet.</h1>
+
+    <p id="emptyText">
+        Be the first to share a cartoon with the Meowzarrela community.
+    </p>
+
+    <button class="main-btn" onclick="openCreate()">
+        ＋ Create Cartoon
+    </button>
+
+</div>
+
+<div id="feed" class="feed hidden"></div>
+
+</main>
+
+<!-- STUDIO -->
+
+<section id="studioPage" class="hidden">
+
+<div class="page-title">
+    🎨 Animation Studio
+</div>
+
+<div class="studio-top">
+    <b>Frame <span id="frameNumber">1</span></b>
+
+    <button class="tool" onclick="clearCanvas()">
+        🗑 Clear
+    </button>
+</div>
+
+<div class="field">
+    <label>Animation Title</label>
+
+    <input
+        id="animationTitle"
+        maxlength="100"
+        placeholder="Example: Animation 1">
+</div>
+
+<div class="canvas-wrap">
+    <canvas id="drawCanvas" width="600" height="400"></canvas>
+</div>
+
+<div class="tools">
+
+<button class="tool" onclick="setTool('pen')">
+    ✏️ Pencil
+</button>
+
+<button class="tool" onclick="setTool('eraser')">
+    🧽 Eraser
+</button>
+
+<button class="tool" onclick="undoDraw()">
+    ↩️ Undo
+</button>
+
+<button class="tool" onclick="duplicateFrame()">
+    📋 Duplicate
+</button>
+
+<button class="tool" onclick="addFrame()">
+    ＋ Frame
+</button>
+
+<button class="tool" onclick="deleteFrame()">
+    🗑 Frame
+</button>
+
+</div>
+
+<div class="tools">
+
+<label class="tool">
+    Color
+    <input id="colorPicker" type="color" value="#222222">
+</label>
+
+<label class="tool">
+    Size
+    <input id="brushSize" type="range" min="1" max="40" value="6">
+</label>
+
+<button class="tool" onclick="toggleOnion()">
+    🧅 Onion Skin
+</button>
+
+<button class="tool" onclick="previewAnimation()">
+    ▶ Preview
+</button>
+
+</div>
+
+<div id="frames" class="frames"></div>
+
+<p style="
+    color:var(--muted);
+    font-size:12px;
+    line-height:1.5">
+    Draw your cartoon frame by frame. Add or duplicate frames,
+    then preview your animation.
+</p>
+
+<button
+    class="main-btn"
+    style="width:100%"
+    onclick="publishAnimation()">
+
+    📤 Publish Animation
+
+</button>
+
+
+</section>
+
+<!-- LIBRARY -->
+
+<section id="libraryPage" class="hidden">
+
+<div class="page-title">
+    📚 Library
+</div>
+
+<div class="library">
+
+<div class="library-header">
+
+<div>
+    <b style="font-size:18px">Your Library</b>
+    <p>Read and create manga, comics and novels.</p>
+</div>
+
+<button class="library-create" onclick="openLibraryCreate()">
+    ＋
+</button>
+
+</div>
+
+<div class="library-tabs">
+
+<button
+    id="libraryTabAll"
+    class="library-tab active"
+    onclick="setLibraryFilter('All')">
+    📚 All
+</button>
+
+<button
+    class="library-tab"
+    onclick="setLibraryFilter('Manga')">
+    🗯️ Manga
+</button>
+
+<button
+    class="library-tab"
+    onclick="setLibraryFilter('Comic')">
+    🎨 Comic
+</button>
+
+<button
+    class="library-tab"
+    onclick="setLibraryFilter('Novel')">
+    📖 Novel
+</button>
+
+</div>
+
+<div id="libraryGrid" class="library-grid"></div>
+
+</div>
+
+</section>
+
+<!-- READER -->
+
+<section id="readerPage" class="hidden">
+
+<div class="page-title">
+    📖 Reader
+</div>
+
+<div class="reader">
+
+<div class="reader-top">
+
+<button class="reader-back" onclick="closeReader()">
+    ←
+</button>
+
+<div class="reader-title" id="readerTitle">
+    Reader
+</div>
+
+</div>
+
+<div class="reader-progress">
+    <span id="readerProgress"></span>
+</div>
+
+<div id="comicReader" class="hidden">
+
+<div class="comic-reader">
+
+<img id="comicReaderImage">
+
+</div>
+
+<div class="comic-controls">
+
+<button class="reader-btn" onclick="previousComicPage()">
+    ← Previous
+</button>
+
+<span id="comicPageNumber">
+    1 / 1
+</span>
+
+<button class="reader-btn primary" onclick="nextComicPage()">
+    Next →
+</button>
+
+</div>
+
+</div>
+
+<div id="novelReader" class="hidden">
+
+<div class="novel-reader">
+
+<div
+    class="novel-chapter-title"
+    id="novelChapterTitle">
+</div>
+
+<div
+    class="novel-text"
+    id="novelText">
+</div>
+
+</div>
+
+<div class="novel-controls">
+
+<button class="reader-btn" onclick="previousNovelChapter()">
+    ← Previous Chapter
+</button>
+
+<button class="reader-btn primary" onclick="nextNovelChapter()">
+    Next Chapter →
+</button>
+
+</div>
+
+</div>
+
+</div>
+
+</section>
+
+<!-- PROFILE -->
+
+<section id="profilePage" class="hidden">
+
+<div class="page-title">
+    Profile
+</div>
+
+<div class="profile">
+
+<div class="profile-avatar" id="profileAvatar">
+    M
+</div>
+
+<h2 id="profileName">
+    Meowzarrela Creator
+</h2>
+
+<div class="profile-username" id="profileUsername">
+    @creator
+</div>
+
+<div class="profile-bio" id="profileBio">
+    Cartoon creator on Meowzarrela.
+</div>
+
+<div class="profile-info">
+
+<div class="info-row">
+    <div class="info-icon">🌍</div>
+    <div>
+        <div class="info-label">Origin</div>
+        <div class="info-value" id="profileOrigin">Not set</div>
+    </div>
+</div>
+
+<div class="info-row">
+    <div class="info-icon">📍</div>
+    <div>
+        <div class="info-label">Place of Birth</div>
+        <div class="info-value" id="profileBirthPlace">Not set</div>
+    </div>
+</div>
+
+<div class="info-row">
+    <div class="info-icon">🏠</div>
+    <div>
+        <div class="info-label">Residence</div>
+        <div class="info-value" id="profileResidence">Not set</div>
+    </div>
+</div>
+
+<div class="info-row">
+    <div class="info-icon">🎂</div>
+    <div>
+        <div class="info-label">Date of Birth</div>
+        <div class="info-value" id="profileBirthDate">Not set</div>
+    </div>
+</div>
+
+</div>
+
+<div class="profile-stats">
+
+<div>
+    <b id="profilePosts">0</b>
+    <span>Cartoons</span>
+</div>
+
+<div>
+    <b id="profileViews">0</b>
+    <span>Views</span>
+</div>
+
+<div>
+    <b id="profileLikes">0</b>
+    <span>Likes</span>
+</div>
+
+</div>
+
+<button class="main-btn" onclick="openEditProfile()">
+    ✏️ Edit Profile
+</button>
+
+</div>
+
+</section>
+
+<!-- SETTINGS -->
+
+<section id="settingsPage" class="hidden">
+
+<div class="page-title">
+    Settings
+</div>
+
+<div class="settings">
+
+<div class="setting">
+
+<div>
+    <b>Dark Mode</b>
+
+    <div style="
+        color:var(--muted);
+        font-size:12px;
+        margin-top:4px">
+
+        Change appearance
+
+    </div>
+</div>
+
+<button
+    class="toggle"
+    id="darkToggle"
+    onclick="toggleDark()">
+
+    <span></span>
+
+</button>
+
+</div>
+
+<div class="setting">
+
+<div>
+    <b>Meowzarrela</b>
+
+    <div style="
+        color:var(--muted);
+        font-size:12px;
+        margin-top:4px">
+
+        Cartoon, animation & reading community
+
+    </div>
+</div>
+
+<span>🧀</span>
+
+</div>
+
+</div>
+
+</section>
+
+</div>
+
+<!-- NAVIGATION -->
+
+<nav class="nav">
+
+<button
+    id="navHome"
+    class="active"
+    onclick="showPage('home')">
+
+    <span style="font-size:21px">🏠</span>
+    Home
+
+</button>
+
+<button
+    id="navStudio"
+    onclick="showPage('studio')">
+
+    <span style="font-size:21px">🎨</span>
+    Studio
+
+</button>
+
+<button
+    id="navCreate"
+    class="create-circle"
+    onclick="openCreate()">
+
+    ＋
+
+</button>
+
+<button
+    id="navLibrary"
+    onclick="showPage('library')">
+
+    <span style="font-size:21px">📚</span>
+    Library
+
+</button>
+
+<button
+    id="navProfile"
+    onclick="showPage('profile')">
+
+    <span style="font-size:21px">👤</span>
+    Profile
+
+</button>
+
+</nav>
+
+<!-- CREATE CARTOON -->
+
+<div class="overlay" id="createOverlay">
+
+<div class="modal">
+
+<div class="modal-head">
+
+<h2>＋ Create Cartoon</h2>
+
+<button
+    class="close"
+    onclick="closeCreate()">
+
+    ✕
+
+</button>
+
+</div>
+
+<div class="field">
+
+<label>Title</label>
+
+<input
+    id="postTitle"
+    placeholder="My New Cartoon">
+
+</div>
+
+<div class="field">
+
+<label>Description</label>
+
+<textarea
+    id="postDescription"
+    placeholder="Tell viewers about your cartoon..."></textarea>
+
+</div>
+
+<div class="field">
+
+<label>Category</label>
+
+<select id="postCategory">
+
+<option>Cartoon</option>
+<option>Animation</option>
+<option>Cartoon Short</option>
+<option>Character</option>
+<option>Cartoon Meme</option>
+<option>Drawing</option>
+<option>Behind the Scenes</option>
+
+</select>
+
+</div>
+
+<div class="field">
+
+<label>Thumbnail</label>
+
+<div class="file-box">
+
+🖼️ Choose thumbnail
+
+<input
+    id="thumbnailFile"
+    type="file"
+    accept="image/*">
+
+</div>
+
+</div>
+
+<div class="field">
+
+<label>Cartoon Video</label>
+
+<div class="file-box">
+
+🎬 Choose video
+
+<input
+    id="videoFile"
+    type="file"
+    accept="video/*">
+
+</div>
+
+</div>
+
+<button
+    class="main-btn"
+    style="width:100%"
+    onclick="publishPost()">
+
+    Publish Cartoon
+
+</button>
+
+</div>
+</div>
+
+<!-- LIBRARY CREATE TYPE -->
+
+<div class="overlay" id="libraryCreateOverlay">
+
+<div class="modal">
+
+<div class="modal-head">
+
+<h2>＋ Create Library</h2>
+
+<button class="close" onclick="closeLibraryCreate()">
+    ✕
+</button>
+
+</div>
+
+<p style="
+    color:var(--muted);
+    line-height:1.5;
+    margin-bottom:15px">
+
+Choose what you want to create.
+
+</p>
+
+<button
+    class="main-btn"
+    style="width:100%;margin-top:0"
+    onclick="openBookEditor('Manga')">
+
+    🗯️ Create Manga
+
+</button>
+
+<button
+    class="main-btn"
+    style="width:100%"
+    onclick="openBookEditor('Comic')">
+
+    🎨 Create Comic
+
+</button>
+
+<button
+    class="main-btn"
+    style="width:100%"
+    onclick="openBookEditor('Novel')">
+
+    📖 Create Novel
+
+</button>
+
+</div>
+</div>
+
+<!-- BOOK EDITOR -->
+
+<div class="overlay" id="bookEditorOverlay">
+
+<div class="modal">
+
+<div class="modal-head">
+
+<h2 id="bookEditorTitle">
+    Create Book
+</h2>
+
+<button class="close" onclick="closeBookEditor()">
+    ✕
+</button>
+
+</div>
+
+<div class="field">
+
+<label>Title</label>
+
+<input
+    id="bookTitle"
+    maxlength="100"
+    placeholder="My Story">
+
+</div>
+
+<div class="field">
+
+<label>Description</label>
+
+<textarea
+    id="bookDescription"
+    maxlength="500"
+    placeholder="Tell readers about your story..."></textarea>
+
+</div>
+
+<div class="field">
+
+<label>Genre</label>
+
+<select id="bookGenre">
+
+<option>Adventure</option>
+<option>Fantasy</option>
+<option>Action</option>
+<option>Comedy</option>
+<option>Drama</option>
+<option>Mystery</option>
+<option>Romance</option>
+<option>Horror</option>
+<option>Science Fiction</option>
+<option>Slice of Life</option>
+<option>Other</option>
+
+</select>
+
+</div>
+
+<div class="field">
+
+<label>Cover</label>
+
+<div class="file-box">
+
+🖼️ Choose cover image
+
+<input
+    id="bookCover"
+    type="file"
+    accept="image/*">
+
+</div>
+
+</div>
+
+<div id="comicEditorFields" class="hidden">
+
+<div class="field">
+
+<label>Comic / Manga Pages</label>
+
+<div class="file-box">
+
+🗯️ Select one or more page images
+
+<input
+    id="comicPages"
+    type="file"
+    accept="image/*"
+    multiple>
+
+</div>
+
+</div>
+
+<p style="
+    color:var(--muted);
+    font-size:12px;
+    line-height:1.5;
+    margin-bottom:12px">
+
+The selected images become pages in their selected order.
+
+</p>
+
+</div>
+
+<div id="novelEditorFields" class="hidden">
+
+<div class="field">
+
+<label>Chapter Title</label>
+
+<input
+    id="chapterTitle"
+    placeholder="Chapter 1 - The Beginning">
+
+</div>
+
+<div class="field">
+
+<label>Chapter Text</label>
+
+<textarea
+    id="chapterText"
+    style="min-height:260px"
+    placeholder="Write your story here..."></textarea>
+
+</div>
+
+<p style="
+    color:var(--muted);
+    font-size:12px;
+    line-height:1.5;
+    margin-bottom:12px">
+
+You can add more chapters after creating the novel.
+
+</p>
+
+</div>
+
+<button
+    class="main-btn"
+    style="width:100%"
+    onclick="publishBook()">
+
+    📚 Publish to Library
+
+</button>
+
+</div>
+</div>
+
+<!-- ADD NOVEL CHAPTER -->
+
+<div class="overlay" id="chapterOverlay">
+
+<div class="modal">
+
+<div class="modal-head">
+
+<h2>＋ Add Chapter</h2>
+
+<button class="close" onclick="closeChapterEditor()">
+    ✕
+</button>
+
+</div>
+
+<div class="field">
+
+<label>Chapter Title</label>
+
+<input
+    id="newChapterTitle"
+    placeholder="Chapter 2 - ...">
+
+</div>
+
+<div class="field">
+
+<label>Chapter Text</label>
+
+<textarea
+    id="newChapterText"
+    style="min-height:280px"
+    placeholder="Continue your story..."></textarea>
+
+</div>
+
+<button
+    class="main-btn"
+    style="width:100%"
+    onclick="addNovelChapter()">
+
+    💾 Add Chapter
+
+</button>
+
+</div>
+</div>
+
+<!-- EDIT PROFILE -->
+
+<div class="overlay" id="editProfileOverlay">
+
+<div class="modal">
+
+<div class="modal-head">
+
+<h2>✏️ Edit Profile</h2>
+
+<button
+    class="close"
+    onclick="closeEditProfile()">
+
+    ✕
+
+</button>
+
+</div>
+
+<div class="edit-photo">
+
+<div
+    class="edit-photo-preview"
+    id="editPhotoPreview">
+
+    M
+
+</div>
+
+<label class="change-photo">
+
+📷 Change Profile Picture
+
+<input
+    id="profilePhotoFile"
+    type="file"
+    accept="image/*"
+    hidden
+    onchange="previewProfilePhoto(event)">
+
+</label>
+
+</div>
+
+<div class="field">
+
+<label>Name</label>
+
+<input
+    id="editName"
+    maxlength="40"
+    placeholder="Your name">
+
+</div>
+
+<div class="field">
+
+<label>Username</label>
+
+<input
+    id="editUsername"
+    maxlength="30"
+    placeholder="username">
+
+</div>
+
+<div class="field">
+
+<label>Origin</label>
+
+<input
+    id="editOrigin"
+    maxlength="60"
+    placeholder="Where are you from?">
+
+</div>
+
+<div class="field">
+
+<label>Place of Birth</label>
+
+<input
+    id="editBirthPlace"
+    maxlength="60"
+    placeholder="Where were you born?">
+
+</div>
+
+<div class="field">
+
+<label>Date of Birth</label>
+
+<input
+    id="editBirthDate"
+    type="date">
+
+</div>
+
+<div class="field">
+
+<label>Residence</label>
+
+<input
+    id="editResidence"
+    maxlength="60"
+    placeholder="Where do you live?">
+
+</div>
+
+<div class="field">
+
+<label>Bio</label>
+
+<textarea
+    id="editBio"
+    maxlength="180"
+    placeholder="Tell people about yourself..."></textarea>
+
+</div>
+
+<button
+    class="main-btn"
+    style="width:100%"
+    onclick="saveProfile()">
+
+    💾 Save Profile
+
+</button>
+
+</div>
+</div>
+
+<!-- COMMENTS -->
+
+<div class="overlay" id="commentOverlay">
+
+<div class="modal">
+
+<div class="modal-head">
+
+<h2>💬 Comments</h2>
+
+<button
+    class="close"
+    onclick="closeComments()">
+
+    ✕
+
+</button>
+
+</div>
+
+<div
+    id="commentList"
+    class="comment-list">
+</div>
+
+<div class="comment-form">
+
+<input
+    id="commentInput"
+    placeholder="Write a comment...">
+
+<button onclick="sendComment()">
+    Send
+</button>
+
+</div>
+
+</div>
+</div>
+
+<!-- RATING -->
+
+<div class="overlay" id="ratingOverlay">
+
+<div class="modal">
+
+<div class="modal-head">
+
+<h2>⭐ Rate Cartoon</h2>
+
+<button
+    class="close"
+    onclick="closeRating()">
+
+    ✕
+
+</button>
+
+</div>
+
+<p style="text-align:center;color:var(--muted)">
+    Choose a rating from 1 to 5.
+</p>
+
+<div class="rating">
+
+<button class="star" onclick="selectRating(1)">★</button>
+<button class="star" onclick="selectRating(2)">★</button>
+<button class="star" onclick="selectRating(3)">★</button>
+<button class="star" onclick="selectRating(4)">★</button>
+<button class="star" onclick="selectRating(5)">★</button>
+
+</div>
+
+<div style="text-align:center">
+
+<button
+    class="main-btn"
+    onclick="saveRating()">
+
+    Submit Rating
+
+</button>
+
+</div>
+
+</div>
+</div>
+
+<!-- PREVIEW -->
+
+<div class="overlay" id="previewOverlay">
+
+<div class="modal">
+
+<div class="modal-head">
+
+<h2>▶ Animation Preview</h2>
+
+<button
+    class="close"
+    onclick="closePreview()">
+
+    ✕
+
+</button>
+
+</div>
+
+<div style="
+    background:#111;
+    padding:8px;
+    border-radius:15px">
+
+<canvas
+    id="previewCanvas"
+    width="600"
+    height="400"
+    style="
+        width:100%;
+        background:white;
+        border-radius:10px">
+</canvas>
+
+</div>
+
+<div style="
+    display:flex;
+    gap:10px;
+    align-items:center;
+    margin-top:15px">
+
+<label style="flex:1">
+
+FPS
+
+<input
+    id="fpsInput"
+    type="range"
+    min="1"
+    max="24"
+    value="8"
+    style="width:100%">
+
+</label>
+
+<b id="fpsValue">8 FPS</b>
+
+</div>
+
+</div>
+</div>
+
+<div class="toast" id="toast"></div>
+
+<script>
+
+const firebaseConfig = {
+    apiKey:"AIzaSyCa0vxaxO511KEByvMPfS6L_4eYHE9OQMc",
+    authDomain:"meowzarrela.firebaseapp.com",
+    projectId:"meowzarrela",
+    storageBucket:"meowzarrela.firebasestorage.app",
+    messagingSenderId:"959683453405",
+    appId:"1:959683453405:web:0d7b1496b481c1485dd634"
+};
+
+/* ==========================
+   PROFILE STORAGE
+========================== */
+
+const defaultAccount={
+    name:"Meowzarrela Creator",
+    username:"creator",
+    origin:"",
+    birthPlace:"",
+    birthDate:"",
+    residence:"",
+    bio:"Cartoon creator on Meowzarrela.",
+    photo:""
+};
+
+let account=JSON.parse(
+    localStorage.getItem("meowzarrela_profile")
+)||defaultAccount;
+
+function saveAccount(){
+    localStorage.setItem(
+        "meowzarrela_profile",
+        JSON.stringify(account)
+    );
+}
+
+/* ==========================
+   POSTS
+========================== */
+
+let posts=JSON.parse(
+    localStorage.getItem("meowzarrela_posts")||"[]"
+);
+
+let currentPostId=null;
+let selectedRating=0;
+
+function savePosts(){
+    localStorage.setItem(
+        "meowzarrela_posts",
+        JSON.stringify(posts)
+    );
+}
+
+/* ==========================
+   LIBRARY STORAGE
+========================== */
+
+let libraryBooks=JSON.parse(
+    localStorage.getItem("meowzarrela_library")||"[]"
+);
+
+let libraryFilter="All";
+
+let currentBookId=null;
+let currentComicPage=0;
+let currentNovelChapter=0;
+
+function saveLibrary(){
+    localStorage.setItem(
+        "meowzarrela_library",
+        JSON.stringify(libraryBooks)
+    );
+}
+
+/* ==========================
+   DARK MODE
+========================== */
+
+let isDark=
+    localStorage.getItem("meowzarrela_dark")==="true";
+
+if(isDark){
+
+    document.body.classList.add("dark");
+
+    document.getElementById(
+        "darkToggle"
+    ).classList.add("on");
+}
+
+function toggleDark(){
+
+    isDark=!isDark;
+
+    document.body.classList.toggle(
+        "dark",
+        isDark
+    );
+
+    localStorage.setItem(
+        "meowzarrela_dark",
+        isDark
+    );
+
+    document.getElementById(
+        "darkToggle"
+    ).classList.toggle("on",isDark);
+}
+
+/* ==========================
+   UI
+========================== */
+
+function toast(text){
+
+    const el=document.getElementById("toast");
+
+    el.textContent=text;
+
+    el.classList.add("show");
+
+    setTimeout(()=>{
+        el.classList.remove("show");
+    },1800);
+}
+
+function showPage(page){
+
+    document.getElementById("homePage")
+        .classList.add("hidden");
+
+    document.getElementById("studioPage")
+        .classList.add("hidden");
+
+    document.getElementById("libraryPage")
+        .classList.add("hidden");
+
+    document.getElementById("readerPage")
+        .classList.add("hidden");
+
+    document.getElementById("profilePage")
+        .classList.add("hidden");
+
+    document.getElementById("settingsPage")
+        .classList.add("hidden");
+
+    document.querySelectorAll(".nav button")
+        .forEach(btn=>btn.classList.remove("active"));
+
+    if(page==="home"){
+
+        document.getElementById("homePage")
+            .classList.remove("hidden");
+
+        document.getElementById("navHome")
+            .classList.add("active");
+
+        renderHome();
+    }
+
+    if(page==="studio"){
+
+        document.getElementById("studioPage")
+            .classList.remove("hidden");
+
+        document.getElementById("navStudio")
+            .classList.add("active");
+
+        loadStudio();
+    }
+
+    if(page==="library"){
+
+        document.getElementById("libraryPage")
+            .classList.remove("hidden");
+
+        document.getElementById("navLibrary")
+            .classList.add("active");
+
+        renderLibrary();
+    }
+
+    if(page==="reader"){
+
+        document.getElementById("readerPage")
+            .classList.remove("hidden");
+    }
+
+    if(page==="profile"){
+
+        document.getElementById("profilePage")
+            .classList.remove("hidden");
+
+        document.getElementById("navProfile")
+            .classList.add("active");
+
+        renderProfile();
+    }
+
+    if(page==="settings"){
+
+        document.getElementById("settingsPage")
+            .classList.remove("hidden");
+    }
+
+    window.scrollTo(0,0);
+}
+
+function openSettings(){
+    showPage("settings");
+}
+
+function toggleSearch(){
+
+    document.getElementById("searchBox")
+        .classList.toggle("hidden");
+
+    if(!document.getElementById("searchBox")
+        .classList.contains("hidden")){
+
+        document.getElementById("searchInput").focus();
+    }
+}
+
+/* ==========================
+   EDIT PROFILE
+========================== */
+
+function openEditProfile(){
+
+    document.getElementById("editName").value=
+        account.name;
+
+    document.getElementById("editUsername").value=
+        account.username;
+
+    document.getElementById("editOrigin").value=
+        account.origin||"";
+
+    document.getElementById("editBirthPlace").value=
+        account.birthPlace||"";
+
+    document.getElementById("editBirthDate").value=
+        account.birthDate||"";
+
+    document.getElementById("editResidence").value=
+        account.residence||"";
+
+    document.getElementById("editBio").value=
+        account.bio||"";
+
+    updateEditPhoto();
+
+    document.getElementById(
+        "editProfileOverlay"
+    ).classList.add("show");
+}
+
+function closeEditProfile(){
+
+    document.getElementById(
+        "editProfileOverlay"
+    ).classList.remove("show");
+}
+
+function updateEditPhoto(){
+
+    const el=document.getElementById(
+        "editPhotoPreview"
+    );
+
+    if(account.photo){
+
+        el.innerHTML=
+            `<img src="${account.photo}">`;
+
+    }else{
+
+        el.textContent=
+            account.name.charAt(0).toUpperCase();
+    }
+}
+
+function previewProfilePhoto(event){
+
+    const file=event.target.files[0];
+
+    if(!file)return;
+
+    if(file.size>5*1024*1024){
+
+        toast("Profile picture must be below 5 MB.");
+        event.target.value="";
+        return;
+    }
+
+    const reader=new FileReader();
+
+    reader.onload=()=>{
+
+        account.photo=reader.result;
+
+        updateEditPhoto();
+    };
+
+    reader.readAsDataURL(file);
+}
+
+function saveProfile(){
+
+    const name=
+        document.getElementById("editName")
+        .value.trim();
+
+    let username=
+        document.getElementById("editUsername")
+        .value.trim()
+        .replace(/^@/,"")
+        .replace(/\s+/g,"");
+
+    if(!name){
+
+        toast("Please enter your name.");
+        return;
+    }
+
+    if(!username){
+
+        toast("Please enter a username.");
+        return;
+    }
+
+    const oldUsername=account.username;
+    const oldName=account.name;
+
+    account.name=name;
+    account.username=username;
+
+    account.origin=
+        document.getElementById("editOrigin")
+        .value.trim();
+
+    account.birthPlace=
+        document.getElementById("editBirthPlace")
+        .value.trim();
+
+    account.birthDate=
+        document.getElementById("editBirthDate")
+        .value;
+
+    account.residence=
+        document.getElementById("editResidence")
+        .value.trim();
+
+    account.bio=
+        document.getElementById("editBio")
+        .value.trim();
+
+    saveAccount();
+
+    posts.forEach(post=>{
+
+        if(
+            post.authorUsername===oldUsername||
+            post.authorName===oldName
+        ){
+
+            post.authorName=account.name;
+            post.authorUsername=account.username;
+            post.authorPhoto=account.photo||"";
+        }
+
+    });
+
+    libraryBooks.forEach(book=>{
+
+        if(
+            book.authorUsername===oldUsername||
+            book.authorName===oldName
+        ){
+
+            book.authorName=account.name;
+            book.authorUsername=account.username;
+        }
+
+    });
+
+    savePosts();
+    saveLibrary();
+
+    closeEditProfile();
+
+    renderProfile();
+    renderHome();
+    renderLibrary();
+
+    toast("Profile saved permanently. 💾");
+}
+
+/* ==========================
+   PROFILE DISPLAY
+========================== */
+
+function renderProfile(){
+
+    const avatar=
+        document.getElementById("profileAvatar");
+
+    if(account.photo){
+
+        avatar.innerHTML=
+            `<img src="${account.photo}">`;
+
+    }else{
+
+        avatar.textContent=
+            account.name.charAt(0).toUpperCase();
+    }
+
+    document.getElementById("profileName")
+        .textContent=account.name;
+
+    document.getElementById("profileUsername")
+        .textContent="@"+account.username;
+
+    document.getElementById("profileBio")
+        .textContent=
+        account.bio||"No bio yet.";
+
+    document.getElementById("profileOrigin")
+        .textContent=
+        account.origin||"Not set";
+
+    document.getElementById("profileBirthPlace")
+        .textContent=
+        account.birthPlace||"Not set";
+
+    document.getElementById("profileResidence")
+        .textContent=
+        account.residence||"Not set";
+
+    document.getElementById("profileBirthDate")
+        .textContent=
+        formatDate(account.birthDate);
+
+    const mine=posts.filter(
+        p=>p.authorUsername===account.username
+    );
+
+    let views=0;
+    let likes=0;
+
+    mine.forEach(p=>{
+
+        views+=p.views||0;
+        likes+=p.likes||0;
+
+    });
+
+    document.getElementById("profilePosts")
+        .textContent=mine.length;
+
+    document.getElementById("profileViews")
+        .textContent=views;
+
+    document.getElementById("profileLikes")
+        .textContent=likes;
+}
+
+function formatDate(date){
+
+    if(!date)return"Not set";
+
+    const d=new Date(date+"T00:00:00");
+
+    if(isNaN(d.getTime())){
+        return date;
+    }
+
+    return d.toLocaleDateString(
+        undefined,
+        {
+            year:"numeric",
+            month:"long",
+            day:"numeric"
+        }
+    );
+}
+
+/* ==========================
+   CREATE POST
+========================== */
+
+function openCreate(){
+
+    document.getElementById(
+        "createOverlay"
+    ).classList.add("show");
+}
+
+function closeCreate(){
+
+    document.getElementById(
+        "createOverlay"
+    ).classList.remove("show");
+}
+
+function fileToDataURL(file){
+
+    return new Promise((resolve,reject)=>{
+
+        const reader=new FileReader();
+
+        reader.onload=()=>resolve(reader.result);
+        reader.onerror=reject;
+
+        reader.readAsDataURL(file);
+
+    });
+}
+
+async function publishPost(){
+
+    const title=
+        document.getElementById("postTitle")
+        .value.trim();
+
+    const description=
+        document.getElementById("postDescription")
+        .value.trim();
+
+    const category=
+        document.getElementById("postCategory")
+        .value;
+
+    const thumbFile=
+        document.getElementById("thumbnailFile")
+        .files[0];
+
+    const videoFile=
+        document.getElementById("videoFile")
+        .files[0];
+
+    if(!title){
+
+        toast("Enter a title.");
+        return;
+    }
+
+    if(!videoFile){
+
+        toast("Choose a cartoon video.");
+        return;
+    }
+
+    if(videoFile.size>35*1024*1024){
+
+        toast("Prototype limit: 35 MB.");
+        return;
+    }
+
+    const button=
+        document.querySelector(
+            "#createOverlay .main-btn"
+        );
+
+    button.disabled=true;
+    button.textContent="Publishing...";
+
+    try{
+
+        let thumbnail="";
+
+        if(thumbFile){
+
+            if(thumbFile.size>8*1024*1024){
+
+                toast("Thumbnail is too large.");
+                return;
+            }
+
+            thumbnail=
+                await fileToDataURL(thumbFile);
+        }
+
+        const video=
+            await fileToDataURL(videoFile);
+
+        const post={
+
+            id:Date.now().toString(),
+
+            title,
+            description,
+            category,
+
+            thumbnail,
+            video,
+
+            authorName:account.name,
+            authorUsername:account.username,
+            authorPhoto:account.photo||"",
+
+            views:0,
+            likes:0,
+            liked:false,
+
+            ratings:[],
+            comments:[],
+
+            createdAt:new Date().toISOString()
+        };
+
+        posts.unshift(post);
+
+        savePosts();
+
+        document.getElementById("postTitle").value="";
+        document.getElementById("postDescription").value="";
+        document.getElementById("thumbnailFile").value="";
+        document.getElementById("videoFile").value="";
+
+        closeCreate();
+
+        showPage("home");
+
+        toast("Cartoon published! 🎬");
+
+    }catch(error){
+
+        console.error(error);
+
+        toast("Something went wrong.");
+
+    }finally{
+
+        button.disabled=false;
+        button.textContent="Publish Cartoon";
+    }
+}
+
+/* ==========================
+   HOME
+========================== */
+
+function renderHome(){
+
+    const feed=
+        document.getElementById("feed");
+
+    const empty=
+        document.getElementById("emptyHome");
+
+    const search=
+        document.getElementById("searchInput")
+        .value.trim().toLowerCase();
+
+    const visible=posts.filter(post=>{
+
+        if(!search)return true;
+
+        return(
+            String(post.title||"")
+                .toLowerCase()
+                .includes(search)||
+            String(post.category||"")
+                .toLowerCase()
+                .includes(search)||
+            String(post.authorUsername||"")
+                .toLowerCase()
+                .includes(search)
+        );
+    });
+
+    if(visible.length===0){
+
+        feed.classList.add("hidden");
+        empty.classList.remove("hidden");
+
+        document.getElementById(
+            "emptyTitle"
+        ).textContent=
+            posts.length===0
+            ?"Nothing here yet."
+            :"No cartoons found.";
+
+        document.getElementById(
+            "emptyText"
+        ).textContent=
+            posts.length===0
+            ?"Be the first to share a cartoon with the Meowzarrela community."
+            :"Try another search.";
+
+        return;
+    }
+
+    empty.classList.add("hidden");
+    feed.classList.remove("hidden");
+
+    feed.innerHTML=visible.map(post=>{
+
+        const rating=averageRating(post);
+
+        return`
+
+<article class="post">
+
+<div class="post-head">
+
+<div class="avatar">
+
+${
+post.authorPhoto
+?`<img src="${post.authorPhoto}">`
+:escapeHTML(
+post.authorName
+.charAt(0)
+.toUpperCase()
+)
+}
+
+</div>
+
+<div class="author">
+
+<b>
+${escapeHTML(post.authorName)}
+</b>
+
+<span>
+@${escapeHTML(post.authorUsername)}
+·
+${timeAgo(post.createdAt)}
+</span>
+
+</div>
+
+<button
+class="more"
+onclick="deletePost('${post.id}')">
+
+⋮
+
+</button>
+
+</div>
+
+<div class="media">
+
+${
+post.video
+?`
+
+<video
+src="${post.video}"
+${post.thumbnail?`poster="${post.thumbnail}"`:""}
+controls
+playsinline
+preload="metadata"
+onloadedmetadata="
+setDuration(
+this,
+'duration-${post.id}'
+)
+">
+
+</video>
+`
+
+:post.thumbnail
+?`
+
+<img src="${post.thumbnail}">
+
+`
+
+:`
+
+<div style="
+height:250px;
+display:flex;
+align-items:center;
+justify-content:center;
+color:white">
+
+🎨 Animation
+
+</div>
+
+`
+}
+
+<span
+class="duration"
+id="duration-${post.id}">
+
+--:--
+
+</span>
+
+</div>
+
+<div class="post-body">
+
+<div class="post-title">
+${escapeHTML(post.title)}
+</div>
+
+<div class="post-desc">
+${escapeHTML(post.description)}
+</div>
+
+<span class="category">
+${escapeHTML(post.category)}
+</span>
+
+<div class="stats">
+
+<span>
+👁️ ${post.views||0}
+</span>
+
+<span>
+❤️ ${post.likes||0}
+</span>
+
+<span>
+⭐ ${rating}
+</span>
+
+<span>
+💬 ${(post.comments||[]).length}
+</span>
+
+</div>
+
+</div>
+
+<div class="actions">
+
+<button
+class="action ${post.liked?"active":""}"
+onclick="likePost('${post.id}')">
+
+❤️ Like
+
+</button>
+
+<button
+class="action"
+onclick="openComments('${post.id}')">
+
+💬 Comment
+
+</button>
+
+<button
+class="action"
+onclick="openRating('${post.id}')">
+
+⭐ Rate
+
+</button>
+
+</div>
+
+</article>
+
+`;
+
+    }).join("");
+}
+
+function setDuration(video,id){
+
+    const el=document.getElementById(id);
+
+    if(el){
+
+        el.textContent=
+            formatDuration(video.duration);
+    }
+}
+
+function formatDuration(seconds){
+
+    if(!isFinite(seconds)){
+        return"--:--";
+    }
+
+    seconds=Math.floor(seconds);
+
+    const hours=Math.floor(seconds/3600);
+
+    const minutes=Math.floor(
+        (seconds%3600)/60
+    );
+
+    const secs=seconds%60;
+
+    if(hours>0){
+
+        return(
+            String(hours).padStart(2,"0")+":"+
+            String(minutes).padStart(2,"0")+":"+
+            String(secs).padStart(2,"0")
+        );
+    }
+
+    return(
+        String(minutes).padStart(2,"0")+":"+
+        String(secs).padStart(2,"0")
+    );
+}
+
+function timeAgo(date){
+
+    const seconds=Math.floor(
+        (Date.now()-new Date(date).getTime())/1000
+    );
+
+    if(seconds<60)return"just now";
+
+    const minutes=Math.floor(seconds/60);
+
+    if(minutes<60)return minutes+"m ago";
+
+    const hours=Math.floor(minutes/60);
+
+    if(hours<24)return hours+"h ago";
+
+    const days=Math.floor(hours/24);
+
+    return days+"d ago";
+}
+
+/* ==========================
+   LIKE
+========================== */
+
+function likePost(id){
+
+    const post=posts.find(
+        p=>p.id===id
+    );
+
+    if(!post)return;
+
+    if(post.liked){
+
+        post.likes=
+            Math.max(0,post.likes-1);
+
+        post.liked=false;
+
+    }else{
+
+        post.likes++;
+        post.liked=true;
+    }
+
+    savePosts();
+
+    renderHome();
+}
+
+/* ==========================
+   COMMENTS
+========================== */
+
+function openComments(id){
+
+    currentPostId=id;
+
+    document.getElementById(
+        "commentOverlay"
+    ).classList.add("show");
+
+    renderComments();
+}
+
+function closeComments(){
+
+    document.getElementById(
+        "commentOverlay"
+    ).classList.remove("show");
+
+    currentPostId=null;
+}
+
+function renderComments(){
+
+    const post=posts.find(
+        p=>p.id===currentPostId
+    );
+
+    if(!post)return;
+
+    if(!post.comments){
+        post.comments=[];
+    }
+
+    const list=
+        document.getElementById("commentList");
+
+    if(post.comments.length===0){
+
+        list.innerHTML=`
+
+<div style="
+text-align:center;
+padding:50px 20px;
+color:var(--muted)">
+
+No comments yet.<br>
+Be the first to comment!
+
+</div>
+
+`;
+
+        return;
+    }
+
+    list.innerHTML=
+        post.comments.map(comment=>`
+
+<div class="comment">
+
+<div class="avatar">
+
+${
+comment.photo
+?`<img src="${comment.photo}">`
+:escapeHTML(
+comment.name.charAt(0).toUpperCase()
+)
+}
+
+</div>
+
+<div class="comment-content">
+
+<b>
+${escapeHTML(comment.name)}
+</b>
+
+<p>
+${escapeHTML(comment.text)}
+</p>
+
+<span style="
+color:var(--muted);
+font-size:11px">
+
+${timeAgo(comment.createdAt)}
+
+</span>
+
+</div>
+
+</div>
+
+`).join("");
+}
+
+function sendComment(){
+
+    const input=
+        document.getElementById(
+            "commentInput"
+        );
+
+    const text=input.value.trim();
+
+    if(!text)return;
+
+    const post=posts.find(
+        p=>p.id===currentPostId
+    );
+
+    if(!post)return;
+
+    if(!post.comments){
+        post.comments=[];
+    }
+
+    post.comments.push({
+
+        name:account.name,
+        photo:account.photo||"",
+        text,
+        createdAt:new Date().toISOString()
+
+    });
+
+    input.value="";
+
+    savePosts();
+
+    renderComments();
+    renderHome();
+}
+
+/* ==========================
+   RATING
+========================== */
+
+function openRating(id){
+
+    currentPostId=id;
+    selectedRating=0;
+
+    updateStars();
+
+    document.getElementById(
+        "ratingOverlay"
+    ).classList.add("show");
+}
+
+function closeRating(){
+
+    document.getElementById(
+        "ratingOverlay"
+    ).classList.remove("show");
+
+    currentPostId=null;
+}
+
+function selectRating(number){
+
+    selectedRating=number;
+
+    updateStars();
+}
+
+function updateStars(){
+
+    document.querySelectorAll(".star")
+        .forEach((star,index)=>{
+
+            star.classList.toggle(
+                "selected",
+                index<selectedRating
+            );
+
+        });
+}
+
+function saveRating(){
+
+    if(selectedRating===0){
+
+        toast("Choose 1–5 stars.");
+        return;
+    }
+
+    const post=posts.find(
+        p=>p.id===currentPostId
+    );
+
+    if(!post)return;
+
+    if(!post.ratings){
+        post.ratings=[];
+    }
+
+    post.ratings.push(selectedRating);
+
+    savePosts();
+
+    closeRating();
+
+    renderHome();
+
+    toast("Rating submitted ⭐");
+}
+
+function averageRating(post){
+
+    if(
+        !post.ratings||
+        post.ratings.length===0
+    ){
+
+        return"0.0";
+    }
+
+    const total=
+        post.ratings.reduce(
+            (a,b)=>a+b,
+            0
+        );
+
+    return(
+        total/post.ratings.length
+    ).toFixed(1);
+}
+
+/* ==========================
+   DELETE
+========================== */
+
+function deletePost(id){
+
+    const post=posts.find(
+        p=>p.id===id
+    );
+
+    if(!post)return;
+
+    if(
+        post.authorUsername!==
+        account.username
+    ){
+
+        toast("Only the creator can delete this.");
+        return;
+    }
+
+    if(
+        !confirm("Delete this cartoon?")
+    ){
+        return;
+    }
+
+    posts=posts.filter(
+        p=>p.id!==id
+    );
+
+    savePosts();
+
+    renderHome();
+    renderProfile();
+
+    toast("Cartoon deleted.");
+}
+
+/* ==========================
+   ANIMATION STUDIO
+========================== */
+
+const canvas=
+    document.getElementById("drawCanvas");
+
+const ctx=
+    canvas.getContext("2d");
+
+let drawing=false;
+let tool="pen";
+let onion=false;
+
+let frames=[];
+let currentFrame=0;
+let history=[];
+
+function blankCanvas(){
+
+    ctx.fillStyle="white";
+
+    ctx.fillRect(
+        0,
+        0,
+        canvas.width,
+        canvas.height
+    );
+}
+
+function canvasData(){
+
+    return canvas.toDataURL("image/png");
+}
+
+function loadStudio(){
+
+    if(frames.length===0){
+
+        blankCanvas();
+
+        frames=[
+            {
+                image:canvasData()
+            }
+        ];
+
+        currentFrame=0;
+    }
+
+    renderFrames();
+}
+
+function setTool(t){
+    tool=t;
+}
+
+function getPointer(e){
+
+    const rect=
+        canvas.getBoundingClientRect();
+
+    const source=
+        e.touches
+        ?e.touches[0]
+        :e;
+
+    return{
+
+        x:
+            (source.clientX-rect.left)
+            *
+            (canvas.width/rect.width),
+
+        y:
+            (source.clientY-rect.top)
+            *
+            (canvas.height/rect.height)
+
+    };
+}
+
+function startDraw(e){
+
+    e.preventDefault();
+
+    drawing=true;
+
+    history.push(
+        canvasData()
+    );
+
+    const p=getPointer(e);
+
+    ctx.beginPath();
+
+    ctx.moveTo(
+        p.x,
+        p.y
+    );
+}
+
+function moveDraw(e){
+
+    if(!drawing)return;
+
+    e.preventDefault();
+
+    const p=getPointer(e);
+
+    ctx.lineWidth=
+        Number(
+            document.getElementById(
+                "brushSize"
+            ).value
+        );
+
+    ctx.lineCap="round";
+    ctx.lineJoin="round";
+
+    ctx.strokeStyle=
+        tool==="eraser"
+        ?"white"
+        :document.getElementById(
+            "colorPicker"
+        ).value;
+
+    ctx.lineTo(
+        p.x,
+        p.y
+    );
+
+    ctx.stroke();
+}
+
+function endDraw(){
+
+    if(!drawing)return;
+
+    drawing=false;
+
+    frames[currentFrame].image=
+        canvasData();
+
+    renderFrames();
+}
+
+canvas.addEventListener(
+    "mousedown",
+    startDraw
+);
+
+canvas.addEventListener(
+    "mousemove",
+    moveDraw
+);
+
+canvas.addEventListener(
+    "mouseup",
+    endDraw
+);
+
+canvas.addEventListener(
+    "mouseleave",
+    endDraw
+);
+
+canvas.addEventListener(
+    "touchstart",
+    startDraw,
+    {passive:false}
+);
+
+canvas.addEventListener(
+    "touchmove",
+    moveDraw,
+    {passive:false}
+);
+
+canvas.addEventListener(
+    "touchend",
+    endDraw
+);
+
+function clearCanvas(){
+
+    history.push(
+        canvasData()
+    );
+
+    blankCanvas();
+
+    frames[currentFrame].image=
+        canvasData();
+
+    renderFrames();
+}
+
+function undoDraw(){
+
+    if(history.length===0){
+
+        toast("Nothing to undo.");
+        return;
+    }
+
+    const previous=
+        history.pop();
+
+    const img=new Image();
+
+    img.onload=()=>{
+
+        ctx.clearRect(
+            0,
+            0,
+            canvas.width,
+            canvas.height
+        );
+
+        ctx.drawImage(
+            img,
+            0,
+            0
+        );
+
+        frames[currentFrame].image=
+            canvasData();
+
+        renderFrames();
+    };
+
+    img.src=previous;
+}
+
+function addFrame(){
+
+    frames.push({
+        image:canvasData()
+    });
+
+    currentFrame=
+        frames.length-1;
+
+    blankCanvas();
+
+    renderFrames();
+
+    toast("New frame added.");
+}
+
+function duplicateFrame(){
+
+    frames.splice(
+        currentFrame+1,
+        0,
+        {
+            image:
+                frames[currentFrame].image
+        }
+    );
+
+    currentFrame++;
+
+    loadFrame(currentFrame);
+    renderFrames();
+}
+
+function deleteFrame(){
+
+    if(frames.length<=1){
+
+        toast("Keep at least one frame.");
+        return;
+    }
+
+    frames.splice(
+        currentFrame,
+        1
+    );
+
+    currentFrame=
+        Math.max(
+            0,
+            currentFrame-1
+        );
+
+    loadFrame(currentFrame);
+    renderFrames();
+}
+
+function loadFrame(index){
+
+    currentFrame=index;
+
+    const img=new Image();
+
+    img.onload=()=>{
+
+        ctx.clearRect(
+            0,
+            0,
+            canvas.width,
+            canvas.height
+        );
+
+        if(
+            onion&&
+            index>0
+        ){
+
+            const previous=new Image();
+
+            previous.onload=()=>{
+
+                ctx.globalAlpha=.25;
+
+                ctx.drawImage(
+                    previous,
+                    0,
+                    0
+                );
+
+                ctx.globalAlpha=1;
+
+                ctx.drawImage(
+                    img,
+                    0,
+                    0
+                );
+
+            };
+
+            previous.src=
+                frames[index-1].image;
+
+        }else{
+
+            ctx.drawImage(
+                img,
+                0,
+                0
+            );
+        }
+    };
+
+    img.src=
+        frames[index].image;
+
+    document.getElementById(
+        "frameNumber"
+    ).textContent=index+1;
+}
+
+function renderFrames(){
+
+    document.getElementById(
+        "frames"
+    ).innerHTML=
+        frames.map(
+            (frame,index)=>`
+
+<button
+class="frame ${
+index===currentFrame
+?"active"
+:""
+}"
+onclick="
+loadFrame(${index});
+renderFrames();
+">
+
+<img src="${frame.image}">
+
+<span>
+${index+1}
+</span>
+
+</button>
+
+`
+        ).join("");
+}
+
+function toggleOnion(){
+
+    onion=!onion;
+
+    loadFrame(currentFrame);
+    renderFrames();
+
+    toast(
+        onion
+        ?"Onion Skin ON 🧅"
+        :"Onion Skin OFF"
+    );
+}
+
+/* ==========================
+   ANIMATION PREVIEW
+========================== */
+
+let previewTimer=null;
+
+function previewAnimation(){
+
+    if(frames.length===0){
+        return;
+    }
+
+    document.getElementById(
+        "previewOverlay"
+    ).classList.add("show");
+
+    const preview=
+        document.getElementById(
+            "previewCanvas"
+        );
+
+    const pctx=
+        preview.getContext("2d");
+
+    let index=0;
+
+    clearInterval(previewTimer);
+
+    function draw(){
+
+        const img=new Image();
+
+        img.onload=()=>{
+
+            pctx.clearRect(
+                0,
+                0,
+                preview.width,
+                preview.height
+            );
+
+            pctx.drawImage(
+                img,
+                0,
+                0,
+                preview.width,
+                preview.height
+            );
+        };
+
+        img.src=
+            frames[index].image;
+
+        index=
+            (index+1)%frames.length;
+    }
+
+    draw();
+
+    const fps=
+        Number(
+            document.getElementById(
+                "fpsInput"
+            ).value
+        );
+
+    previewTimer=
+        setInterval(
+            draw,
+            1000/fps
+        );
+}
+
+document.getElementById(
+    "fpsInput"
+).addEventListener(
+    "input",
+    function(){
+
+        document.getElementById(
+            "fpsValue"
+        ).textContent=
+            this.value+" FPS";
+
+        if(
+            document.getElementById(
+                "previewOverlay"
+            ).classList.contains("show")
+        ){
+
+            previewAnimation();
+        }
+    }
+);
+
+function closePreview(){
+
+    clearInterval(previewTimer);
+
+    document.getElementById(
+        "previewOverlay"
+    ).classList.remove("show");
+}
+
+/* ==========================
+   RENDER STUDIO VIDEO
+========================== */
+
+async function renderStudioVideo(){
+
+    return new Promise((resolve,reject)=>{
+
+        try{
+
+            const fps=
+                Number(
+                    document.getElementById(
+                        "fpsInput"
+                    ).value
+                )||8;
+
+            const renderCanvas=
+                document.createElement("canvas");
+
+            renderCanvas.width=canvas.width;
+            renderCanvas.height=canvas.height;
+
+            const renderCtx=
+                renderCanvas.getContext("2d");
+
+            const stream=
+                renderCanvas.captureStream(fps);
+
+            const mimeTypes=[
+                "video/webm;codecs=vp9",
+                "video/webm;codecs=vp8",
+                "video/webm"
+            ];
+
+            let mimeType="";
+
+            for(const type of mimeTypes){
+
+                if(
+                    MediaRecorder.isTypeSupported(type)
+                ){
+
+                    mimeType=type;
+                    break;
+                }
+            }
+
+            if(!mimeType){
+
+                reject(
+                    new Error(
+                        "This browser does not support WebM recording."
+                    )
+                );
+
+                return;
+            }
+
+            const recorder=
+                new MediaRecorder(
+                    stream,
+                    {
+                        mimeType,
+                        videoBitsPerSecond:2500000
+                    }
+                );
+
+            const chunks=[];
+
+            recorder.ondataavailable=(event)=>{
+
+                if(
+                    event.data&&
+                    event.data.size>0
+                ){
+
+                    chunks.push(event.data);
+                }
+            };
+
+            recorder.onerror=(event)=>{
+
+                reject(
+                    event.error||
+                    new Error(
+                        "Video recording failed."
+                    )
+                );
+            };
+
+            recorder.onstop=()=>{
+
+                const blob=
+                    new Blob(
+                        chunks,
+                        {
+                            type:mimeType
+                        }
+                    );
+
+                resolve(blob);
+            };
+
+            const frameDuration=
+                1000/fps;
+
+            let index=0;
+
+            function drawNextFrame(){
+
+                if(index>=frames.length){
+
+                    setTimeout(()=>{
+
+                        recorder.stop();
+
+                    },frameDuration);
+
+                    return;
+                }
+
+                const image=new Image();
+
+                image.onload=()=>{
+
+                    renderCtx.clearRect(
+                        0,
+                        0,
+                        renderCanvas.width,
+                        renderCanvas.height
+                    );
+
+                    renderCtx.drawImage(
+                        image,
+                        0,
+                        0,
+                        renderCanvas.width,
+                        renderCanvas.height
+                    );
+
+                    index++;
+
+                    setTimeout(
+                        drawNextFrame,
+                        frameDuration
+                    );
+                };
+
+                image.onerror=()=>{
+
+                    recorder.stop();
+
+                    reject(
+                        new Error(
+                            "Could not load animation frame."
+                        )
+                    );
+                };
+
+                image.src=
+                    frames[index].image;
+            }
+
+            recorder.start();
+
+            drawNextFrame();
+
+        }catch(error){
+
+            reject(error);
+        }
+    });
+}
+
+/* ==========================
+   BLOB TO DATA URL
+========================== */
+
+function blobToDataURL(blob){
+
+    return new Promise((resolve,reject)=>{
+
+        const reader=
+            new FileReader();
+
+        reader.onload=()=>{
+            resolve(reader.result);
+        };
+
+        reader.onerror=reject;
+
+        reader.readAsDataURL(blob);
+    });
+}
+
+/* ==========================
+   PUBLISH STUDIO ANIMATION
+========================== */
+
+async function publishAnimation(){
+
+    if(frames.length===0){
+
+        toast("Create at least one frame.");
+        return;
+    }
+
+    const animationTitle=
+        document.getElementById(
+            "animationTitle"
+        ).value.trim();
+
+    if(!animationTitle){
+
+        toast("Please enter an animation title.");
+        return;
+    }
+
+    const button=
+        document.querySelector(
+            "#studioPage .main-btn"
+        );
+    button.disabled=true;
+
+    button.textContent=
+        "🎬 Rendering Animation...";
+
+    try{
+
+        toast("Rendering your animation... 🎬");
+
+        const videoBlob=
+            await renderStudioVideo();
+
+        if(
+            !videoBlob||
+            videoBlob.size===0
+        ){
+
+            throw new Error(
+                "Video is empty."
+            );
+        }
+
+        const video=
+            await blobToDataURL(
+                videoBlob
+            );
+
+        const post={
+
+            id:
+                Date.now().toString(),
+
+            title:
+    animationTitle,
+            description:
+                "Created with Meowzarrela Animation Studio.",
+
+            category:
+                "Animation",
+
+            thumbnail:
+                frames[0].image,
+
+            video:
+                video,
+
+            authorName:
+                account.name,
+
+            authorUsername:
+                account.username,
+
+            authorPhoto:
+                account.photo||"",
+
+            views:0,
+
+            likes:0,
+
+            liked:false,
+
+            ratings:[],
+
+            comments:[],
+
+            studioFrames:
+                frames.length,
+
+            createdAt:
+                new Date().toISOString()
+        };
+
+        posts.unshift(post);
+
+        savePosts();
+
+        showPage("home");
+
+        toast(
+            "Animation published as video! 🎬"
+        );
+
+    }catch(error){
+
+        console.error(
+            "Animation render error:",
+            error
+        );
+
+        toast(
+            "Failed to create animation video."
+        );
+
+    }finally{
+
+        button.disabled=false;
+
+        button.textContent=
+            "📤 Publish Animation";
+    }
+}
+
+/* ==========================================================
+   LIBRARY
+========================================================== */
+
+/* OPEN CREATE MENU */
+
+function openLibraryCreate(){
+
+    document.getElementById(
+        "libraryCreateOverlay"
+    ).classList.add("show");
+}
+
+function closeLibraryCreate(){
+
+    document.getElementById(
+        "libraryCreateOverlay"
+    ).classList.remove("show");
+}
+
+/* BOOK EDITOR */
+
+let creatingBookType="";
+
+function openBookEditor(type){
+
+    creatingBookType=type;
+
+    closeLibraryCreate();
+
+    document.getElementById(
+        "bookEditorTitle"
+    ).textContent=
+        "Create "+type;
+
+    document.getElementById("bookTitle").value="";
+    document.getElementById("bookDescription").value="";
+    document.getElementById("bookCover").value="";
+
+    document.getElementById(
+        "comicPages"
+    ).value="";
+
+    document.getElementById(
+        "chapterTitle"
+    ).value="";
+
+    document.getElementById(
+        "chapterText"
+    ).value="";
+
+    if(type==="Novel"){
+
+        document.getElementById(
+            "comicEditorFields"
+        ).classList.add("hidden");
+
+        document.getElementById(
+            "novelEditorFields"
+        ).classList.remove("hidden");
+
+    }else{
+
+        document.getElementById(
+            "comicEditorFields"
+        ).classList.remove("hidden");
+
+        document.getElementById(
+            "novelEditorFields"
+        ).classList.add("hidden");
+    }
+
+    document.getElementById(
+        "bookEditorOverlay"
+    ).classList.add("show");
+}
+
+function closeBookEditor(){
+
+    document.getElementById(
+        "bookEditorOverlay"
+    ).classList.remove("show");
+}
+
+/* PUBLISH BOOK */
+
+async function publishBook(){
+
+    const title=
+        document.getElementById(
+            "bookTitle"
+        ).value.trim();
+
+    const description=
+        document.getElementById(
+            "bookDescription"
+        ).value.trim();
+
+    const genre=
+        document.getElementById(
+            "bookGenre"
+        ).value;
+
+    const coverFile=
+        document.getElementById(
+            "bookCover"
+        ).files[0];
+
+    if(!title){
+
+        toast("Enter a title.");
+        return;
+    }
+
+    let cover="";
+
+    try{
+
+        if(coverFile){
+
+            if(
+                coverFile.size>
+                6*1024*1024
+            ){
+
+                toast("Cover is too large.");
+                return;
+            }
+
+            cover=
+                await fileToDataURL(
+                    coverFile
+                );
+        }
+
+        const book={
+
+            id:
+                Date.now().toString(),
+
+            type:
+                creatingBookType,
+
+            title,
+            description,
+            genre,
+
+            cover,
+
+            authorName:
+                account.name,
+
+            authorUsername:
+                account.username,
+
+            createdAt:
+                new Date().toISOString(),
+
+            views:0,
+
+            likes:0
+        };
+
+        if(
+            creatingBookType==="Manga"||
+            creatingBookType==="Comic"
+        ){
+
+            const files=
+                Array.from(
+                    document.getElementById(
+                        "comicPages"
+                    ).files
+                );
+
+            if(files.length===0){
+
+                toast(
+                    "Add at least one comic page."
+                );
+
+                return;
+            }
+
+            if(files.length>80){
+
+                toast(
+                    "Maximum 80 pages in this prototype."
+                );
+
+                return;
+            }
+
+            const pages=[];
+
+            for(const file of files){
+
+                if(
+                    file.size>
+                    5*1024*1024
+                ){
+
+                    toast(
+                        "One of the pages is too large."
+                    );
+
+                    return;
+                }
+
+                pages.push(
+                    await fileToDataURL(file)
+                );
+            }
+
+            book.pages=pages;
+
+        }else{
+
+            const chapterTitle=
+                document.getElementById(
+                    "chapterTitle"
+                ).value.trim();
+
+            const chapterText=
+                document.getElementById(
+                    "chapterText"
+                ).value.trim();
+
+            if(!chapterText){
+
+                toast(
+                    "Write your first chapter."
+                );
+
+                return;
+            }
+
+            book.chapters=[{
+
+                id:
+                    Date.now().toString(),
+
+                title:
+                    chapterTitle||
+                    "Chapter 1",
+
+                text:
+                    chapterText
+
+            }];
+        }
+
+        libraryBooks.unshift(book);
+
+        saveLibrary();
+
+        closeBookEditor();
+
+        renderLibrary();
+
+        showPage("library");
+
+        toast(
+            creatingBookType+
+            " published to Library! 📚"
+        );
+
+    }catch(error){
+
+        console.error(error);
+
+        toast(
+            "Could not create this book."
+        );
+    }
+}
+
+/* FILTER */
+
+function setLibraryFilter(filter){
+
+    libraryFilter=filter;
+
+    document.querySelectorAll(
+        ".library-tab"
+    ).forEach(btn=>{
+        btn.classList.remove("active");
+    });
+
+    const tabs=
+        document.querySelectorAll(
+            ".library-tab"
+        );
+
+    if(filter==="All")tabs[0].classList.add("active");
+    if(filter==="Manga")tabs[1].classList.add("active");
+    if(filter==="Comic")tabs[2].classList.add("active");
+    if(filter==="Novel")tabs[3].classList.add("active");
+
+    renderLibrary();
+}
+
+/* RENDER LIBRARY */
+
+function renderLibrary(){
+
+    const grid=
+        document.getElementById(
+            "libraryGrid"
+        );
+
+    if(!grid)return;
+
+    let books=
+        libraryBooks.filter(book=>{
+
+            if(
+                libraryFilter==="All"
+            ){
+                return true;
+            }
+
+            return book.type===
+                libraryFilter;
+        });
+
+    if(books.length===0){
+
+        grid.innerHTML=`
+
+<div
+class="library-empty"
+style="grid-column:1/-1">
+
+<div class="library-empty-icon">
+📚
+</div>
+
+<b>No ${libraryFilter==="All"?"books":libraryFilter.toLowerCase()+"s"} yet.</b>
+
+<p style="
+margin-top:7px;
+line-height:1.5">
+
+Tap the ＋ button above to create one.
+
+</p>
+
+</div>
+
+`;
+
+        return;
+    }
+
+    grid.innerHTML=
+        books.map(book=>{
+
+            const icon=
+                book.type==="Novel"
+                ?"📖"
+                :"🗯️";
+
+            const count=
+                book.type==="Novel"
+                ?(book.chapters||[]).length+
+                    " chapter"+
+                    ((book.chapters||[]).length===1?"":"s")
+                :(book.pages||[]).length+
+                    " page"+
+                    ((book.pages||[]).length===1?"":"s");
+
+            return`
+
+<div class="book-card">
+
+<div class="book-cover">
+
+${
+book.cover
+?`<img src="${book.cover}">`
+:`<div class="book-cover-icon">${icon}</div>`
+}
+
+<div class="book-type">
+${escapeHTML(book.type)}
+</div>
+
+</div>
+
+<div class="book-info">
+
+<div class="book-title">
+${escapeHTML(book.title)}
+</div>
+
+<div class="book-author">
+by ${escapeHTML(book.authorName)}
+</div>
+
+<div class="book-description">
+${escapeHTML(
+(book.description||"").slice(0,100)
+)}
+</div>
+
+<div style="
+color:var(--muted);
+font-size:10px;
+margin-top:7px">
+
+${escapeHTML(book.genre)}
+ ·
+${count}
+
+</div>
+
+<button
+class="book-action"
+onclick="openBook('${book.id}')">
+
+📖 Read
+
+</button>
+
+${
+book.type==="Novel"&&
+book.authorUsername===account.username
+?`
+
+<button
+class="reader-btn"
+style="width:100%;margin-top:7px"
+onclick="openChapterEditor('${book.id}')">
+
+＋ Add Chapter
+
+</button>
+
+`
+:""
+}
+
+${
+book.authorUsername===account.username
+?`
+
+<button
+class="reader-btn"
+style="
+width:100%;
+margin-top:7px;
+color:var(--danger)"
+onclick="deleteBook('${book.id}')">
+
+🗑 Delete
+
+</button>
+
+`
+:""
+}
+
+</div>
+
+</div>
+
+`;
+
+        }).join("");
+}
+
+/* ==========================
+   OPEN BOOK
+========================== */
+
+function openBook(id){
+
+    const book=
+        libraryBooks.find(
+            b=>b.id===id
+        );
+
+    if(!book)return;
+
+    currentBookId=id;
+
+    if(
+        book.type==="Manga"||
+        book.type==="Comic"
+    ){
+
+        currentComicPage=0;
+
+        document.getElementById(
+            "comicReader"
+        ).classList.remove("hidden");
+
+        document.getElementById(
+            "novelReader"
+        ).classList.add("hidden");
+
+        document.getElementById(
+            "readerTitle"
+        ).textContent=
+            book.title;
+
+        showPage("reader");
+
+        renderComicReader();
+
+    }else{
+
+        currentNovelChapter=0;
+
+        document.getElementById(
+            "novelReader"
+        ).classList.remove("hidden");
+
+        document.getElementById(
+            "comicReader"
+        ).classList.add("hidden");
+
+        document.getElementById(
+            "readerTitle"
+        ).textContent=
+            book.title;
+
+        showPage("reader");
+
+        renderNovelReader();
+    }
+
+    book.views=
+        (book.views||0)+1;
+
+    saveLibrary();
+}
+
+/* ==========================
+   COMIC READER
+========================== */
+
+function renderComicReader(){
+
+    const book=
+        libraryBooks.find(
+            b=>b.id===currentBookId
+        );
+
+    if(!book||!book.pages)return;
+
+    const image=
+        document.getElementById(
+            "comicReaderImage"
+        );
+
+    image.src=
+        book.pages[currentComicPage];
+
+    document.getElementById(
+        "comicPageNumber"
+    ).textContent=
+        (currentComicPage+1)+
+        " / "+
+        book.pages.length;
+
+    const progress=
+        ((currentComicPage+1)/
+        book.pages.length)*100;
+
+    document.getElementById(
+        "readerProgress"
+    ).style.width=
+        progress+"%";
+}
+
+function nextComicPage(){
+
+    const book=
+        libraryBooks.find(
+            b=>b.id===currentBookId
+        );
+
+    if(!book)return;
+
+    if(
+        currentComicPage<
+        book.pages.length-1
+    ){
+
+        currentComicPage++;
+
+        renderComicReader();
+
+        window.scrollTo(0,0);
+
+    }else{
+
+        toast("End of comic. 📚");
+    }
+}
+
+function previousComicPage(){
+
+    if(currentComicPage>0){
+
+        currentComicPage--;
+
+        renderComicReader();
+
+        window.scrollTo(0,0);
+
+    }else{
+
+        toast("This is the first page.");
+    }
+}
+
+/* ==========================
+   NOVEL READER
+========================== */
+
+function renderNovelReader(){
+
+    const book=
+        libraryBooks.find(
+            b=>b.id===currentBookId
+        );
+
+    if(
+        !book||
+        !book.chapters||
+        book.chapters.length===0
+    ){
+        return;
+    }
+
+    const chapter=
+        book.chapters[currentNovelChapter];
+
+    document.getElementById(
+        "novelChapterTitle"
+    ).textContent=
+        chapter.title;
+
+    document.getElementById(
+        "novelText"
+    ).textContent=
+        chapter.text;
+
+    const progress=
+        ((currentNovelChapter+1)/
+        book.chapters.length)*100;
+
+    document.getElementById(
+        "readerProgress"
+    ).style.width=
+        progress+"%";
+}
+
+function nextNovelChapter(){
+
+    const book=
+        libraryBooks.find(
+            b=>b.id===currentBookId
+        );
+
+    if(!book)return;
+
+    if(
+        currentNovelChapter<
+        book.chapters.length-1
+    ){
+
+        currentNovelChapter++;
+
+        renderNovelReader();
+
+        window.scrollTo(0,0);
+
+    }else{
+
+        toast("End of novel. 📖");
+    }
+}
+
+function previousNovelChapter(){
+
+    if(currentNovelChapter>0){
+
+        currentNovelChapter--;
+
+        renderNovelReader();
+
+        window.scrollTo(0,0);
+
+    }else{
+
+        toast("This is the first chapter.");
+    }
+}
+
+/* ==========================
+   CLOSE READER
+========================== */
+
+function closeReader(){
+
+    currentBookId=null;
+
+    showPage("library");
+}
+
+/* ==========================
+   ADD NOVEL CHAPTER
+========================== */
+
+function openChapterEditor(bookId){
+
+    const book=
+        libraryBooks.find(
+            b=>b.id===bookId
+        );
+
+    if(!book)return;
+
+    if(
+        book.authorUsername!==
+        account.username
+    ){
+
+        toast("Only the creator can add chapters.");
+        return;
+    }
+
+    currentBookId=bookId;
+
+    document.getElementById(
+        "newChapterTitle"
+    ).value="";
+
+    document.getElementById(
+        "newChapterText"
+    ).value="";
+
+    document.getElementById(
+        "chapterOverlay"
+    ).classList.add("show");
+}
+
+function closeChapterEditor(){
+
+    document.getElementById(
+        "chapterOverlay"
+    ).classList.remove("show");
+}
+
+function addNovelChapter(){
+
+    const book=
+        libraryBooks.find(
+            b=>b.id===currentBookId
+        );
+
+    if(!book)return;
+
+    const title=
+        document.getElementById(
+            "newChapterTitle"
+        ).value.trim();
+
+    const text=
+        document.getElementById(
+            "newChapterText"
+        ).value.trim();
+
+    if(!text){
+
+        toast("Write something first.");
+        return;
+    }
+
+    if(!book.chapters){
+        book.chapters=[];
+    }
+
+    book.chapters.push({
+
+        id:
+            Date.now().toString(),
+
+        title:
+            title||
+            "Chapter "+
+            (book.chapters.length+1),
+
+        text
+    });
+
+    saveLibrary();
+
+    closeChapterEditor();
+
+    renderLibrary();
+
+    toast("Chapter added! 📖");
+}
+
+/* ==========================
+   DELETE BOOK
+========================== */
+
+function deleteBook(id){
+
+    const book=
+        libraryBooks.find(
+            b=>b.id===id
+        );
+
+    if(!book)return;
+
+    if(
+        book.authorUsername!==
+        account.username
+    ){
+
+        toast("Only the creator can delete this.");
+        return;
+    }
+
+    if(
+        !confirm(
+            "Delete \""+
+            book.title+
+            "\"?"
+        )
+    ){
+        return;
+    }
+
+    libraryBooks=
+        libraryBooks.filter(
+            b=>b.id!==id
+        );
+
+    saveLibrary();
+
+    renderLibrary();
+
+    toast("Book deleted.");
+}
+
+/* ==========================
+   SECURITY / HTML
+========================== */
+
+function escapeHTML(text){
+
+    return String(text||"")
+        .replaceAll("&","&amp;")
+        .replaceAll("<","&lt;")
+        .replaceAll(">","&gt;")
+        .replaceAll('"',"&quot;")
+        .replaceAll("'","&#039;");
+}
+
+/* ==========================
+   INIT
+========================== */
+
+renderHome();
+
+renderProfile();
+
+renderLibrary();
+
+</script>
+
+</body>
+</html>
