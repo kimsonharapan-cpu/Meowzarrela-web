@@ -5523,9 +5523,9 @@ renderProfile();
 
 renderLibrary();
 // ==========================================
-// KODE LOGIN MULTI-BAHASA + FITUR LUPA AKUN
+// KODE LOGIN MULTI-BAHASA + LUPA AKUN + INGAT LOGIN (ANTI-ULANG)
 // ==========================================
-let authMode = "login"; // login, register, atau forgot
+let authMode = "login"; 
 let regEmail = ""; 
 let regPassword = "";
 
@@ -5544,9 +5544,6 @@ const textCatalog = {
         btnLogin: "Masuk Sekarang 🐾",
         btnReg: "Daftar Akun 📑",
         btnForgot: "Perbarui Akun 🔄",
-        promptLogin: "Belum punya akun? [Daftar di sini] atau [Lupa Akun?]",
-        promptReg: "Sudah punya akun? [Login di sini]",
-        promptForgot: "Ingat akunmu? [Login di sini]",
         alertRegSuccess: "🎉 Daftar Berhasil! Silakan masuk menggunakan akun tersebut.",
         alertForgotSuccess: "🔄 Akun berhasil diperbarui! Silakan masuk dengan email & password baru kamu.",
         alertLoginSuccess: "🐱 Meoww! Login Sukses!",
@@ -5562,9 +5559,6 @@ const textCatalog = {
         btnLogin: "Login Now 🐾",
         btnReg: "Register Account 📑",
         btnForgot: "Update Account 🔄",
-        promptLogin: "Don't have an account? [Register here] or [Forgot Account?]",
-        promptReg: "Already have an account? [Login here]",
-        promptForgot: "Remember your credentials? [Login here]",
         alertRegSuccess: "🎉 Registration Successful! Please log in now.",
         alertForgotSuccess: "🔄 Account successfully updated! Please log in with your new credentials.",
         alertLoginSuccess: "🐱 Meoww! Login Success!",
@@ -5587,7 +5581,7 @@ window.updateAuthUI = function() {
         desc.innerText = textCatalog[lang].descLogin;
         btn.innerText = textCatalog[lang].btnLogin;
         promptContainer.innerHTML = lang === 'id' 
-            ? `Belum punya akun? <a href="#" onclick="changeAuthMode(event, 'register')">Daftar di sini</a> atau <a href="#" onclick="changeAuthMode(event, 'forgot')">Lupa Akun?</a>`
+            ? `Belum punya akun? <a href="#" onclick="changeAuthMode(event, 'register')">Daftar di sini</a> or <a href="#" onclick="changeAuthMode(event, 'forgot')">Lupa Akun?</a>`
             : `Don't have an account? <a href="#" onclick="changeAuthMode(event, 'register')">Register here</a> or <a href="#" onclick="changeAuthMode(event, 'forgot')">Forgot Account?</a>`;
     } else if (authMode === "register") {
         title.innerText = textCatalog[lang].titleReg;
@@ -5606,19 +5600,29 @@ window.updateAuthUI = function() {
     }
 }
 
-// Fungsi bantu untuk navigasi menu login
 window.changeAuthMode = function(e, mode) {
     if(e) e.preventDefault();
     authMode = mode;
     window.updateAuthUI();
 }
 
-// Inisialisasi awal saat halaman di-load browser
+// 🔐 3. CEK APAKAH USER SUDAH PERNAH LOGIN SEBELUMNYA (ANTI-ULANG)
 document.addEventListener("DOMContentLoaded", () => {
+    // Ambil data status login dari memori browser
+    const statusLogin = localStorage.getItem("meowzarrela_logged_in");
+    
+    // Jika statusnya 'true', langsung buka tirai secara otomatis tanpa login lagi!
+    if (statusLogin === "true") {
+        const tirai = document.getElementById("authOverlay");
+        if (tirai) {
+            tirai.style.display = "none";
+        }
+    }
+
     setTimeout(() => { window.updateAuthUI(); }, 100);
 });
 
-// 🔐 3. FUNGSI UTAMA EKSEKUSI TOMBOL SUBMIT FORM
+// 🔑 4. FUNGSI UTAMA EKSEKUSI TOMBOL SUBMIT FORM
 window.handleAuth = function(e) {
     e.preventDefault();
     const emailBox = document.getElementById("authEmail");
@@ -5631,19 +5635,16 @@ window.handleAuth = function(e) {
     const pass = passBox.value;
 
     if (authMode === "register") {
-        // PROSES DAFTAR AKUN BARU
         regEmail = email; 
         regPassword = pass;
         alert(textCatalog[lang].alertRegSuccess);
         window.changeAuthMode(e, 'login');
     } else if (authMode === "forgot") {
-        // PROSES MERESET AKUN KARENA LUPA
         regEmail = email;
         regPassword = pass;
         alert(textCatalog[lang].alertForgotSuccess);
         window.changeAuthMode(e, 'login');
     } else if (authMode === "login") {
-        // PROSES VALIDASI MASUK (LOGIN)
         if (regEmail === "") { 
             regEmail = "admin@gmail.com"; 
             regPassword = "123456"; 
@@ -5651,6 +5652,10 @@ window.handleAuth = function(e) {
 
         if (email === regEmail && pass === regPassword) {
             alert(textCatalog[lang].alertLoginSuccess);
+            
+            // SIMPAN STATUS: Tandai di memori browser bahwa user ini sudah sukses login!
+            localStorage.setItem("meowzarrela_logged_in", "true");
+            
             const tirai = document.getElementById("authOverlay");
             if (tirai) {
                 tirai.style.setProperty("display", "none", "important");
@@ -5661,7 +5666,15 @@ window.handleAuth = function(e) {
     }
 }
 
+// 🚪 5. FUNGSI BONUS: TOMBOL LOGOUT (KELUAR)
+window.logoutMeowzarrela = function() {
+    localStorage.removeItem("meowzarrela_logged_in");
+    alert(userLang === 'id' ? "Kamu telah keluar." : "You have logged out.");
+    window.location.reload();
+}
+
+
 </script>
 
 </body>
-</html>
+   </html>
