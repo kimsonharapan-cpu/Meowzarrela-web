@@ -4,10 +4,20 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width,initial-scale=1.0,maximum-scale=1.0,user-scalable=no">
 <title>Meowzarrela</title>
-<meta name="google-site-verification" content="..." />
+<meta name="google-site-verification" content="D2lTIwthnXq3lICwYrLDGqD_cmOp1CeUcVReRIdeT4A" />
 <style>/* ==========================
    BOOK CREATOR
 ========================== */
+/* --- LOGIN OVERLAY --- */
+.auth-overlay { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background-color: #FFFDE7; display: flex; justify-content: center; align-items: center; z-index: 999999; font-family: sans-serif; }
+.auth-container { background: white; padding: 30px; border-radius: 20px; box-shadow: 0 10px 25px rgba(0,0,0,0.1); width: 100%; max-width: 380px; text-align: center; border: 3px solid #FFD54F; box-sizing: border-box; }
+.form-group { margin-bottom: 15px; text-align: left; }
+.form-group label { display: block; font-size: 14px; font-weight: bold; margin-bottom: 5px; color: #4E342E; }
+.form-group input { width: 100%; padding: 10px; border: 2px solid #E0E0E0; border-radius: 10px; box-sizing: border-box; }
+.auth-container button { width: 100%; padding: 12px; background: #FFD54F; border: none; border-radius: 10px; font-weight: bold; cursor: pointer; box-shadow: 0 4px 0 #FFB300; }
+.auth-container button:hover { background: #FFB300; }
+.switch-text { margin-top: 15px; font-size: 14px; }
+.switch-text a { color: #FF9800; text-decoration: none; font-weight: bold; }
 
 .book-status{
     display:inline-block;
@@ -403,36 +413,7 @@ button{
     font-weight:900;
 }
 
-.cheese{
-    width:38px;
-    height:30px;
-    background:#ffd84d;
-    border-radius:8px 8px 10px 10px;
-    box-shadow:0 4px 0 #d9aa21;
-    position:relative;
-}
 
-.cheese:before,
-.cheese:after{
-    content:"";
-    position:absolute;
-    background:#dcae27;
-    border-radius:50%;
-}
-
-.cheese:before{
-    width:6px;
-    height:6px;
-    left:9px;
-    top:8px;
-}
-
-.cheese:after{
-    width:8px;
-    height:8px;
-    right:7px;
-    bottom:5px;
-}
 
 .header-actions{
     display:flex;
@@ -1423,13 +1404,38 @@ body.dark .change-photo{
 </head>
 
 <body>
+<!-- Tirai Login Penutup Web Utama -->
+<div id="authOverlay" class="auth-overlay">
+    <div class="auth-container">
+        <div style="font-size: 50px; margin-bottom: 10px;">🧀</div>
+        <h2 id="authTitle" style="color:#FF9800; margin:0 0 5px 0; font-family:sans-serif;">Meowzarrela</h2>
+        <p id="authDesc" style="margin:0 0 20px 0; color:#795548; font-size:14px; font-family:sans-serif;">Create an animation of your story here.</p>
+
+        <form id="authForm" onsubmit="handleAuth(event)">
+            <div class="form-group">
+                <label>email address</label>
+                <input type="email" id="authEmail" placeholder="make your email" required>
+            </div>
+            <div class="form-group">
+                <label>Password</label>
+                <input type="password" id="authPassword" placeholder="at least 6 characters" required>
+            </div>
+            <button type="submit" id="submitBtn">Enter 🐾</button>
+        </form>
+
+        <div class="switch-text">
+            <span id="switchPrompt">Don't have an account yet?</span> 
+            <a href="#" id="switchLink" onclick="toggleMode(event)">Register here</a>
+        </div>
+    </div>
+</div>
 
 <div class="app">
 
 <header class="header">
 
 <div class="brand">
-    <div class="cheese"></div>
+    <div class="cheese">🧀</div>
     <span>Meowzarrela</span>
 </div>
 
@@ -5516,6 +5522,144 @@ renderHome();
 renderProfile();
 
 renderLibrary();
+// ==========================================
+// KODE LOGIN MULTI-BAHASA + FITUR LUPA AKUN
+// ==========================================
+let authMode = "login"; // login, register, atau forgot
+let regEmail = ""; 
+let regPassword = "";
+
+// 🌐 1. DETEKSI BAHASA HP USER OTOMATIS
+const userLang = (navigator.language || navigator.userLanguage).startsWith('id') ? 'id' : 'en';
+
+// Kumpulan teks terjemahan lengkap
+const textCatalog = {
+    id: {
+        titleLogin: "Masuk Meowzarrela",
+        titleReg: "Daftar Akun Baru",
+        titleForgot: "Reset Akun Kamu",
+        descLogin: "Yuk masuk dulu untuk melihat web kerenmu!",
+        descReg: "Buat akun Meowzarrela kamu gratis dalam beberapa detik!",
+        descForgot: "Masukkan Email baru dan Password baru untuk menyetel ulang.",
+        btnLogin: "Masuk Sekarang 🐾",
+        btnReg: "Daftar Akun 📑",
+        btnForgot: "Perbarui Akun 🔄",
+        promptLogin: "Belum punya akun? [Daftar di sini] atau [Lupa Akun?]",
+        promptReg: "Sudah punya akun? [Login di sini]",
+        promptForgot: "Ingat akunmu? [Login di sini]",
+        alertRegSuccess: "🎉 Daftar Berhasil! Silakan masuk menggunakan akun tersebut.",
+        alertForgotSuccess: "🔄 Akun berhasil diperbarui! Silakan masuk dengan email & password baru kamu.",
+        alertLoginSuccess: "🐱 Meoww! Login Sukses!",
+        alertWrong: "❌ Waduh, Email atau Password salah!"
+    },
+    en: {
+        titleLogin: "Login to Meowzarrela",
+        titleReg: "Register New Account",
+        titleForgot: "Reset Your Account",
+        descLogin: "Please log in first to view your awesome web!",
+        descReg: "Create your free Meowzarrela account in just a few seconds!",
+        descForgot: "Enter a new Email and Password to reset your credentials.",
+        btnLogin: "Login Now 🐾",
+        btnReg: "Register Account 📑",
+        btnForgot: "Update Account 🔄",
+        promptLogin: "Don't have an account? [Register here] or [Forgot Account?]",
+        promptReg: "Already have an account? [Login here]",
+        promptForgot: "Remember your credentials? [Login here]",
+        alertRegSuccess: "🎉 Registration Successful! Please log in now.",
+        alertForgotSuccess: "🔄 Account successfully updated! Please log in with your new credentials.",
+        alertLoginSuccess: "🐱 Meoww! Login Success!",
+        alertWrong: "❌ Wrong Email or Password!"
+    }
+};
+
+// ⚙️ 2. FUNGSI UNTUK MENGATUR TAMPILAN TEKS FORM
+window.updateAuthUI = function() {
+    const lang = userLang;
+    const title = document.getElementById("authTitle");
+    const desc = document.getElementById("authDesc");
+    const btn = document.getElementById("submitBtn");
+    const promptContainer = document.getElementById("switchPrompt");
+    
+    if (!title || !desc || !btn || !promptContainer) return;
+
+    if (authMode === "login") {
+        title.innerText = textCatalog[lang].titleLogin;
+        desc.innerText = textCatalog[lang].descLogin;
+        btn.innerText = textCatalog[lang].btnLogin;
+        promptContainer.innerHTML = lang === 'id' 
+            ? `Belum punya akun? <a href="#" onclick="changeAuthMode(event, 'register')">Daftar di sini</a> atau <a href="#" onclick="changeAuthMode(event, 'forgot')">Lupa Akun?</a>`
+            : `Don't have an account? <a href="#" onclick="changeAuthMode(event, 'register')">Register here</a> or <a href="#" onclick="changeAuthMode(event, 'forgot')">Forgot Account?</a>`;
+    } else if (authMode === "register") {
+        title.innerText = textCatalog[lang].titleReg;
+        desc.innerText = textCatalog[lang].descReg;
+        btn.innerText = textCatalog[lang].btnReg;
+        promptContainer.innerHTML = lang === 'id'
+            ? `Sudah punya akun? <a href="#" onclick="changeAuthMode(event, 'login')">Login di sini</a>`
+            : `Already have an account? <a href="#" onclick="changeAuthMode(event, 'login')">Login here</a>`;
+    } else if (authMode === "forgot") {
+        title.innerText = textCatalog[lang].titleForgot;
+        desc.innerText = textCatalog[lang].descForgot;
+        btn.innerText = textCatalog[lang].btnForgot;
+        promptContainer.innerHTML = lang === 'id'
+            ? `Ingat akunmu? <a href="#" onclick="changeAuthMode(event, 'login')">Login di sini</a>`
+            : `Remember your credentials? <a href="#" onclick="changeAuthMode(event, 'login')">Login here</a>`;
+    }
+}
+
+// Fungsi bantu untuk navigasi menu login
+window.changeAuthMode = function(e, mode) {
+    if(e) e.preventDefault();
+    authMode = mode;
+    window.updateAuthUI();
+}
+
+// Inisialisasi awal saat halaman di-load browser
+document.addEventListener("DOMContentLoaded", () => {
+    setTimeout(() => { window.updateAuthUI(); }, 100);
+});
+
+// 🔐 3. FUNGSI UTAMA EKSEKUSI TOMBOL SUBMIT FORM
+window.handleAuth = function(e) {
+    e.preventDefault();
+    const emailBox = document.getElementById("authEmail");
+    const passBox = document.getElementById("authPassword");
+    const lang = userLang;
+
+    if(!emailBox || !passBox) return;
+
+    const email = emailBox.value;
+    const pass = passBox.value;
+
+    if (authMode === "register") {
+        // PROSES DAFTAR AKUN BARU
+        regEmail = email; 
+        regPassword = pass;
+        alert(textCatalog[lang].alertRegSuccess);
+        window.changeAuthMode(e, 'login');
+    } else if (authMode === "forgot") {
+        // PROSES MERESET AKUN KARENA LUPA
+        regEmail = email;
+        regPassword = pass;
+        alert(textCatalog[lang].alertForgotSuccess);
+        window.changeAuthMode(e, 'login');
+    } else if (authMode === "login") {
+        // PROSES VALIDASI MASUK (LOGIN)
+        if (regEmail === "") { 
+            regEmail = "admin@gmail.com"; 
+            regPassword = "123456"; 
+        }
+
+        if (email === regEmail && pass === regPassword) {
+            alert(textCatalog[lang].alertLoginSuccess);
+            const tirai = document.getElementById("authOverlay");
+            if (tirai) {
+                tirai.style.setProperty("display", "none", "important");
+            }
+        } else {
+            alert(textCatalog[lang].alertWrong);
+        }
+    }
+}
 
 </script>
 
