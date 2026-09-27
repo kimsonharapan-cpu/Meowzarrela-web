@@ -2577,6 +2577,10 @@ FPS
 </div>
 
 <div class="toast" id="toast"></div>
+<!-- Panggil Firebase App, Firestore, dan Storage versi lama/compat biar cocok dengan script HTML biasa -->
+<script src="https://gstatic.com"></script>
+<script src="https://gstatic.com"></script>
+<script src="https://gstatic.com"></script>
 
 <script>
 
@@ -2588,6 +2592,9 @@ const firebaseConfig = {
     messagingSenderId:"959683453405",
     appId:"1:959683453405:web:0d7b1496b481c1485dd634"
 };
+firebase.initializeApp(firebaseConfig);
+const db = firebase.firestore();
+const storage = firebase.storage();
 
 /* ==========================
    PROFILE STORAGE
@@ -5673,6 +5680,63 @@ window.logoutMeowzarrela = function() {
     window.location.reload();
 }
 
+// ==========================================
+// KODE UNTUK MENYEBARKAN VIDEO KE SEMUA ORANG
+// ==========================================
+
+// 1. FUNGSI UNTUK POST VIDEO BARU (UPLOAD KE SERVER)
+async function uploadDanPostVideo(fileVideo, namaUser, caption) {
+    try {
+        const namaFileUnik = Date.now() + "_" + fileVideo.name;
+        // Upload file asli ke Firebase Storage
+        const storageRef = storage.ref("videos/" + namaFileUnik);
+        const snapshot = await storageRef.put(fileVideo);
+        
+        // Ambil link url video online-nya yang bisa diakses publik
+        const urlVideoOnline = await snapshot.ref.getDownloadURL();
+        
+        // Simpan ke database bersama (Firestore)
+        await db.collection("posts_video").add({
+            username: namaUser,
+            caption: caption,
+            videoUrl: urlVideoOnline,
+            createdAt: firebase.firestore.FieldValue.serverTimestamp()
+        });
+        
+        alert("Video berhasil diposting dan langsung menyebar!");
+    } catch (error) {
+        console.error("Gagal post video:", error);
+        alert("Eror saat upload: " + error.message);
+    }
+}
+
+// 2. FUNGSI RADAR (OTOMATIS TAMPIL DI HP SEMUA ORANG SECARA REAL-TIME)
+function aktifkanRadarVideo() {
+    db.collection("posts_video")
+      .orderBy("createdAt", "desc")
+      .onSnapshot((snapshot) => {
+          // Ganti "timeline-video" di bawah ini dengan ID elemen HTML tempat kamu biasa nampilin postingan
+          const container = document.getElementById("timeline-video"); 
+          if (!container) return;
+          
+          container.innerHTML = ""; // Bersihkan layar biar tidak menumpuk ganda
+          
+          snapshot.forEach((doc) => {
+              const data = doc.data();
+              const elemenVideo = `
+                  <div class="video-card" style="margin-bottom: 20px; padding: 10px; border-bottom: 1px solid #ccc;">
+                      <b>@${data.username}</b>
+                      <p>${data.caption || ""}</p>
+                      <video src="${data.videoUrl}" controls width="100%" style="border-radius: 8px; max-height: 400px; background: #000;"></video>
+                  </div>
+              `;
+              container.innerHTML += elemenVideo;
+          });
+      });
+}
+
+// Langsung jalankan radarnya begitu halaman web dibuka
+aktifkanRadarVideo();
 
 </script>
 <script src="tracker.js"></script>
